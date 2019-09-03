@@ -10,7 +10,7 @@ defmodule Vampire do
 end
 
 
-stream = Task.Supervisor.async_stream(MySupervisor,3..10000,Vampire, :printrandom, [], max_concurrency: 6000)
+stream = Task.Supervisor.async_stream(MySupervisor,3..100000,Vampire, :printrandom, [], max_concurrency: 4000)
 
 Enum.to_list(stream)
 
