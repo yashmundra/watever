@@ -13,8 +13,7 @@ defmodule Vampire do
 	Enum.filter(b, fn {x,y} -> (length(Integer.digits(x))==div(sz,2)) && 
 	                           (length(Integer.digits(y))==div(sz,2)) &&
                                    !(Enum.at(Integer.digits(x),length(Integer.digits(x))-1)===0 && Enum.at(Integer.digits(x),length(Integer.digits(x))-1)) &&
-                                   (Enum.sort(Integer.digits(x)++Integer.digits(y))==Enum.sort(Integer.digits(n))) end)
-	    
+                                   (Enum.sort(Integer.digits(x)++Integer.digits(y))==Enum.sort(Integer.digits(n))) end)   
 	#not both have trailing zeroes
 	#digits combine to equal the number
 	#if all cond'n met then add these fangs to the return value
@@ -30,11 +29,21 @@ defmodule Vampire do
   end
 
   def mainfunc(n) do
-    case fangs(n) do
-    	[] -> nil 
-    	x  -> "#{n} #{Enum.reduce(Enum.map(x, fn {a,b} -> Integer.to_string(a)<>" "<>Integer.to_string(b) end), fn a, acc -> acc<>" "<>a end)}"
+    {k,v} = n
+    Enum.map(k..v, fn x -> decider(x) end) |> Enum.filter(fn x -> x != :noluck end)
+  end
+
+  def decider(n) do
+    x = fangs(n)
+    if x != [] do
+      #IO.inspect(n)
+      #IO.inspect(Enum.reduce(Enum.map(x, fn {a,b} -> Integer.to_string(a)<>" "<>Integer.to_string(b) end), fn a, acc -> acc<>" "<>a end)) 
+      "#{n} #{Enum.reduce(Enum.map(x, fn {a,b} -> Integer.to_string(a)<>" "<>Integer.to_string(b) end), fn a, acc -> acc<>" "<>a end)}"
+    else
+      :noluck
     end
   end
+
 end
 
 
@@ -43,11 +52,15 @@ Supervisor.start_link([
   {Task.Supervisor, name: MySupervisor}
 ], strategy: :one_for_one)
 
+workerUnits = 30
+#construcitng worker unit ranges
+myranges = Enum.take_every(min..max, workerUnits) |> Enum.map(fn x -> {x,x+workerUnits-1} end)
 
-stream = Task.Supervisor.async_stream(MySupervisor,min..max,Vampire, :mainfunc, [], max_concurrency: 4000)
 
-a = Enum.filter(Enum.to_list(stream),fn {:ok,x} -> x != nil end)
-b = Enum.map(a, fn {:ok,x} -> x end)
-c = Enum.reduce(b, "", fn x, acc -> acc<>"\n"<>x end)
-IO.puts(c)
+stream = Task.Supervisor.async_stream(MySupervisor,myranges,Vampire, :mainfunc, [], max_concurrency: 10)
+
+IO.puts Enum.to_list(stream) |> Enum.filter(fn {:ok,x} -> x != [] end) |> Enum.map(fn {:ok,x} -> x end) |> Enum.map(fn x -> Enum.reduce(x,"",fn x,acc -> acc<>x<>"\n" end) end)
+
+
+
 
