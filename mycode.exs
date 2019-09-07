@@ -52,9 +52,12 @@ Supervisor.start_link([
   {Task.Supervisor, name: MySupervisor}
 ], strategy: :one_for_one)
 
-workerUnits = 30
 #construcitng worker unit ranges
-myranges = Enum.take_every(min..max, workerUnits) |> Enum.map(fn x -> {x,x+workerUnits-1} end)
+workerUnits = 30
+sz = Enum.take_every(min..max, workerUnits) |> Enum.map(fn x -> {x,x+workerUnits-1} end)
+new = Enum.take(sz, Enum.count(sz)-1)
+{_,b} = Enum.at(new,Enum.count(new)-1)
+myranges = Enum.concat(new,[{b+1,max}])
 
 
 stream = Task.Supervisor.async_stream(MySupervisor,myranges,Vampire, :mainfunc, [], max_concurrency: 10)
