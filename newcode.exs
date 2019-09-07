@@ -1,4 +1,4 @@
-defmodule SimpleGenServerBehaviour do
+defmodule MyGenServer do
   use GenServer
 
   def start_link() do
@@ -77,5 +77,5 @@ end
 
 min = elem(Integer.parse(Enum.at(System.argv,0)),0)
 max = elem(Integer.parse(Enum.at(System.argv,1)),0)
-{:ok, pid} = SimpleGenServerBehaviour.start_link()
-IO.puts SimpleGenServerBehaviour.run(pid, {min,max})
+{:ok, pid} = MyGenServer.start_link()
+IO.puts MyGenServer.run(pid, {min,max})
