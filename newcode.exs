@@ -79,3 +79,17 @@ min = elem(Integer.parse(Enum.at(System.argv,0)),0)
 max = elem(Integer.parse(Enum.at(System.argv,1)),0)
 {:ok, pid} = MyGenServer.start_link()
 IO.puts MyGenServer.run(pid, {min,max})
+
+
+
+#Distributed Process
+#iex --name remote@ip1 --cookie chocolate
+#iex --name local@ip2 --cookie chocolate
+#Node.connect :remote@ip1
+#
+#On remote:
+#GenServer.start_link(MyGenServer, [:hello], name: :My)
+#
+#On local:
+#IO.puts GenServer.call({:My,:remote@ip1},{100,2000})
+
