@@ -75,21 +75,4 @@ defmodule Vampire do
 
 end
 
-GenServer.start_link(MyGenServer, [:hi], name: :My)
-
-min = elem(Integer.parse(Enum.at(System.argv,0)),0)
-max = elem(Integer.parse(Enum.at(System.argv,1)),0)
-IO.puts GenServer.call(:My,{min,max})
-
-
-#Distributed Process
-#iex --name remote@ip1 --cookie chocolate -S distributedworker.ex
-#iex --name local@ip2 --cookie chocolate -S distributedserver.ex
-#Node.connect :remote@ip1
-#
-#On remote:
-#GenServer.start_link(MyGenServer, [:hello], name: :My)
-#
-#On local:
-#IO.puts GenServer.call({:My,:remote@ip1},{100,2000})
-
+GenServer.start_link(MyGenServer, [:hello], name: :My)
