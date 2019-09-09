@@ -1,6 +1,3 @@
-min = elem(Integer.parse(Enum.at(System.argv,0)),0)
-max = elem(Integer.parse(Enum.at(System.argv,1)),0)
-
 defmodule Vampire do
   def fangs(n) do
     #returns all the fangs of the number
@@ -45,25 +42,3 @@ defmodule Vampire do
   end
 
 end
-
-
-
-Supervisor.start_link([
-  {Task.Supervisor, name: MySupervisor}
-], strategy: :one_for_one)
-
-#construcitng worker unit ranges 
-workerUnits = 27
-sz = Enum.take_every(min..max, workerUnits) |> Enum.map(fn x -> {x,x+workerUnits-1} end)
-new = Enum.take(sz, Enum.count(sz)-1)
-{_,b} = Enum.at(new,Enum.count(new)-1)
-myranges = Enum.concat(new,[{b+1,max}])
-
-
-stream = Task.Supervisor.async_stream(MySupervisor,myranges,Vampire, :mainfunc, [], max_concurrency: 10)
-
-IO.puts Enum.to_list(stream) |> Enum.filter(fn {:ok,x} -> x != [] end) |> Enum.map(fn {:ok,x} -> x end) |> Enum.map(fn x -> Enum.reduce(x,"",fn x,acc -> acc<>x<>"\n" end) end)
-
-
-
-

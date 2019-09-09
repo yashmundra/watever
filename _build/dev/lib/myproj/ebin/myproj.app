@@ -1,0 +1,10 @@
+{application,myproj,
+             [{applications,[kernel,stdlib,elixir,logger]},
+              {description,"myproj"},
+              {modules,['Elixir.MyApp','Elixir.MyAppDistributed',
+                        'Elixir.MyAppDistributedWorker','Elixir.MyGenServer',
+                        'Elixir.Vampire']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {error,{"no such file or directory","Elixir.Myproj.app"}},
+              {mod,{'Elixir.MyApp',[]}}]}.

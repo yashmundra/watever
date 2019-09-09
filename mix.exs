@@ -1,9 +1,9 @@
-defmodule Final.MixProject do
+defmodule Myproj.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :final,
+      app: :myproj,
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
@@ -14,7 +14,9 @@ defmodule Final.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      Application.start(Myproj),
+      extra_applications: [:logger],
+      mod: {MyApp,[]}
     ]
   end
 
