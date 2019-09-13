@@ -20,13 +20,28 @@ defmodule FindMyNeighbour do
   end
 
   def rand2D(positions,pid_map,myid) do
-	#SPECIAL since it takes positions of other and self positions is mapping of id to position {x,y}
-	#returns the neighbouring pids to send msg to 
+	#positions is mapping of id to position {x,y}
+	
+	myposition = Map.fetch(positions,myid)
+		
+	pids_to_check = Map.delete(pid_map,myid) |> Map.keys()
+	Enum.filter(pids_to_check,fn pid -> check_threshold(Map.fetch(positions,pid),myposition,0.1) end)
+ 
+  end
+
+  def check_threshold(pos1,pos2,threshold) do
+    {x1,y1} = pos1
+    {x2,y2} = pos2
+    dist = :math.pow(x2-x1,2)+:math.pow(y2-y1,2)
+    cond do
+      dist < threshold -> true
+      true -> false
+    end
   end
 
   def 3Dtorus(pid_map,id) do
 	#returns the neighbouring pids to send msg to 
- 
+ 	
   end
 
   def honeycomb(pid_map,id) do
