@@ -2,14 +2,15 @@ defmodule MyActor do
   use GenServer
 
   def start_link(default) do
-    GenServer.start_link(__MODULE__, default) 
+    GenServer.start_link(__MODULE__, default)
   end
-  
+
   def init(state) do
     #Added Task supervisor to monitor all workers
     Supervisor.start_link([{Task.Supervisor, name: MySupervisor}], strategy: :one_for_one)
     #state is {id,topology}
     {:ok,state}
+    # comment #
   end
 
   def handle_call(rumour, _, state) do
