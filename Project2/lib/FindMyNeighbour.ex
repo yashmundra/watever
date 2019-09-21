@@ -8,13 +8,13 @@ defmodule FindMyNeighbour do
   	Map.values(Map.delete(pid_map,myid))
   end
 
-  def line(pid_map,id) do
+  def line(pid_map,myid) do
 	#returns the neighbouring pids to send msg to 
         cond do
         
-	id==1 -> Map.fetch(pid_map,2) 
-        id==map_size(pid_map) -> Map.fetch(pid_map,id-1) 
-	true -> [Map.fetch(pid_map,id-1),Map.fetch(pid_map,id+1)]
+	myid==1 -> Map.fetch(pid_map,2) 
+        myid==map_size(pid_map) -> Map.fetch(pid_map,myid-1) 
+	true -> [Map.fetch(pid_map,myid-1),Map.fetch(pid_map,myid+1)]
 
 	end      
   end
