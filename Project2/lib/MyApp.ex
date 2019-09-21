@@ -6,6 +6,8 @@ defmodule MyApp do
     numNodes = Enum.at(System.argv,0)
     topology = Enum.at(System.argv,1)
     algorithm = Enum.at(System.argv,2)
+    rumour = "Hi"
+    w = 1
     
     children = [
   		{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
@@ -21,6 +23,22 @@ defmodule MyApp do
     #pick one and send thema  rumor
     #wait and collect terminations from every actor
     #return success
+    
+    if String.equivalent?(topology,"rand2D") do
+      positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}}) |> Enum.into(%{})
+    else
+      positions = nil
+    end
+
+    #Initializing Genservers
+    if String.equivalent?(algorithm,"gossip") do
+      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,rumour,pid_map,k,positions,topology}))
+    else #push sum
+      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,k,w,pid_map,k,positions,topology}))
+    end
+
+
+
 
 
 
