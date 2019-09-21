@@ -10,7 +10,7 @@ defmodule MyActor do
   end
 
   #for initializing gossip actors
-  def handle_call({:initialize,rumour,pid_map,myid,positions,topology},_from, _state) do
+  def handle_call({:initialize,pid_map,myid,positions,topology},_from, _state) do
     count = 1
     {:noreply,{count,pid_map,myid,positions, topology}}
   end
@@ -41,7 +41,7 @@ defmodule MyActor do
     new_w = w + w1
     current_estimate = div(new_s,new_w)
     
-    if current_estimate-prev_prev_estimate < threshold do
+    if current_estimate-prev_prev_estimate < threshold and prev_prev_estimate!=nil do
       {:stop, :normal, {new_s,new_W,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
     else
       prev_prev_estimate = prev_estimate
