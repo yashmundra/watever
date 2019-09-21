@@ -20,7 +20,7 @@ defmodule MyApp do
     a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyActor) end) |> Enum.map(fn {:ok,x} -> x end)
     pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     
-    
+
     IO.puts("Calculating positions")
     positions = nil
     if String.equivalent?(topology,"rand2D") do
@@ -50,7 +50,8 @@ defmodule MyApp do
 
   def checker(pid_map) do
     count = Enum.map(pid_map, fn {k,v} -> Process.info(v) end) |> Enum.count(fn x -> x == nil end)
-
+    IO.puts("count is ")
+    IO.puts(count)
     if count == Enum.count(pid_map) do
       IO.puts("Terminated")
     else

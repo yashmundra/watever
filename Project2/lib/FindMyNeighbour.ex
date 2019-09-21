@@ -12,23 +12,18 @@ defmodule FindMyNeighbour do
 
   def line(pid_map,myid) do
 	#returns the neighbouring pids to send msg to 
-        cond do
-        
-	myid==1 -> Map.fetch(pid_map,2) 
-        myid==map_size(pid_map) -> Map.fetch(pid_map,myid-1) 
-	true -> [Map.fetch(pid_map,myid-1),Map.fetch(pid_map,myid+1)]
-
-	end      
+    cond do
+      myid==1 -> [elem(Map.fetch(pid_map,2),1)]
+      myid==map_size(pid_map) -> [elem(Map.fetch(pid_map,myid-1),1)]
+	    true -> [elem(Map.fetch(pid_map,myid-1),1),elem(Map.fetch(pid_map,myid+1),1)]
+    end      
   end
 
   def rand2D(positions,pid_map,myid) do
-	#positions is mapping of id to position {x,y}
-	
-	myposition = Map.fetch(positions,myid)
-		
-	pids_to_check = Map.delete(pid_map,myid) |> Map.keys()
-	Enum.filter(pids_to_check,fn pid -> check_threshold(Map.fetch(positions,pid),myposition,0.1) end)
- 
+	  #positions is mapping of id to position {x,y}
+	  {:ok,myposition} = Map.fetch(positions,myid)
+	  pids_to_check = Map.delete(pid_map,myid) |> Map.keys()
+	  Enum.filter(pids_to_check,fn pid -> check_threshold(elem(Map.fetch(positions,pid),1),myposition,0.1) end)
   end
 
   def check_threshold(pos1,pos2,threshold) do
