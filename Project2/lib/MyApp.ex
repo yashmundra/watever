@@ -32,7 +32,7 @@ defmodule MyApp do
     end
 
     #Initializing Genservers
-    if String.equivalent?(algorithm,"gossip") do
+    if String.equivalent?(algorithm,"gossip") do #for gossip
       IO.puts("Initializing Genservers")
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
