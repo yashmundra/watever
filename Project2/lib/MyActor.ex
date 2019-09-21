@@ -30,8 +30,8 @@ defmodule MyActor do
     IO.puts("new count is ")
     IO.puts(newcount)
     cond do
-      newcount > 10 -> {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
-      newcount <= 10 -> {:noreply, {newcount, pid_map,myid,positions,topology}}
+      newcount >= 10 -> {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
+      newcount < 10 -> {:noreply, {newcount, pid_map,myid,positions,topology}}
     end
   end
 

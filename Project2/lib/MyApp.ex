@@ -20,10 +20,6 @@ defmodule MyApp do
     a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyActor) end) |> Enum.map(fn {:ok,x} -> x end)
     pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     
-    #initilaize the actors with the topology, pidmap and their id
-    #pick one and send thema  rumor
-    #wait and collect terminations from every actor
-    #return success
     
     IO.puts("Calculating positions")
     positions = nil
@@ -54,12 +50,9 @@ defmodule MyApp do
 
   def checker(pid_map) do
     count = Enum.map(pid_map, fn {k,v} -> Process.info(v) end) |> Enum.count(fn x -> x == nil end)
-    #IO.puts("nil count is ")
-    #IO.puts(count)
 
-    #IO.inspect(Enum.map(pid_map, fn {k,v} -> Process.info(v) end))
     if count == Enum.count(pid_map) do
-      :success
+      IO.puts("Terminated")
     else
       Process.sleep(2000)
       checker(pid_map)
