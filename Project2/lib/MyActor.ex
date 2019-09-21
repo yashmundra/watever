@@ -22,7 +22,7 @@ defmodule MyActor do
   def handle_cast({rumour}, {count,pid_map,myid,positions,topology}) do
     #select random neighbour and send rumour
     #IO.puts("received rumour")
-    GenServer.cast(findmyneighbour(pid_map,myid,topology,positions),{rumour})
+    #GenServer.cast(findmyneighbour(pid_map,myid,topology,positions),{rumour})
     #GenServer.cast(process_id,{rumour})
     #IO.puts("sent rumour to a neighbour")
 
@@ -31,9 +31,11 @@ defmodule MyActor do
     #IO.puts(newcount)
     IO.puts("my id is")
     IO.puts(myid)
-    cond do
-      newcount >= 10 -> {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
-      newcount < 10 -> {:noreply, {newcount, pid_map,myid,positions,topology}}
+    if newcount >= 10 do
+      {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
+    else
+      GenServer.cast(findmyneighbour(pid_map,myid,topology,positions),{rumour})
+      {:noreply, {newcount, pid_map,myid,positions,topology}}
     end
   end
 
