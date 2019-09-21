@@ -54,6 +54,10 @@ defmodule MyApp do
 
   def checker(pid_map) do
     count = Enum.map(pid_map, fn {k,v} -> Process.info(v) end) |> Enum.count(fn x -> x == nil end)
+    #IO.puts("nil count is ")
+    #IO.puts(count)
+
+    #IO.inspect(Enum.map(pid_map, fn {k,v} -> Process.info(v) end))
     if count == Enum.count(pid_map) do
       :success
     else

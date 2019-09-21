@@ -9,17 +9,25 @@ defmodule MyActor do
     {:ok,state}
   end
 
+###################################################     GOSSIP   ########################################################################
+
+
   #for initializing gossip actors
-  def handle_call({:initialize,pid_map,myid,positions,topology},_from, _state) do
+  def handle_cast({:initialize,pid_map,myid,positions,topology},_state) do
     count = 1
     {:noreply,{count,pid_map,myid,positions, topology}}
   end
 
   #gossip call
-  def handle_cast({rumour}, _from, {count,pid_map,myid,positions,topology}) do
+  def handle_cast({rumour}, {count,pid_map,myid,positions,topology}) do
     #select random neighbour and send rumour
-    GenServer.call(findmyneighbour(pid_map,myid,topology,positions),{rumour})
+    IO.puts("received rumour")
+    GenServer.cast(findmyneighbour(pid_map,myid,topology,positions),{rumour})
+    IO.puts("sent rumour to a neighbour")
+
     newcount = count+1
+    IO.puts("count increased ")
+    IO.puts(newcount)
     cond do
       newcount > 10 -> {:stop, :normal, newcount, pid_map,myid,positions,topology}
       newcount <= 10 -> {:noreply, newcount, pid_map,myid,positions,topology}
@@ -30,7 +38,7 @@ defmodule MyActor do
 
 ###################################################        PUSH SUM   ########################################################################
   #for initializing push sum actors
-  def handle_cast({:initialize,s,w,pid_map,myid,positions,topology},_from, _state) do
+  def handle_cast({:initialize,s,w,pid_map,myid,positions,topology},_state) do
     {:noreply,{s,w,nil,nil,pid_map,myid,positions,topology}}
   end
 
@@ -56,21 +64,15 @@ defmodule MyActor do
 #####################################################     NEIGHBOUR SEARCH   ###################################################################
 
   def findmyneighbour(pid_map,myid,topology,positions) do
-    
-
-    neighbours = []
 
     case topology do
-    'full' -> neighbours = FindMyNeighbour.full(pid_map,myid)
-    'line' -> neighbours = FindMyNeighbour.line(pid_map,myid)
-    'rand2D' -> neighbours = FindMyNeighbour.rand2D(positions,pid_map,myid)
-    '3Dtorus' -> neighbours = FindMyNeighbour.torus(pid_map,myid)
-    'honeycomb' -> neighbours = FindMyNeighbour.honeycomb(pid_map,myid)
-    'randhoneycomb' -> neighbours = FindMyNeighbour.randhoneycomb(pid_map,myid)
+    "full" -> Enum.random(FindMyNeighbour.full(pid_map,myid))
+    "line" -> Enum.random(FindMyNeighbour.line(pid_map,myid))
+    "rand2D" -> Enum.random(FindMyNeighbour.rand2D(positions,pid_map,myid))
+    "3Dtorus" -> Enum.random(FindMyNeighbour.torus(pid_map,myid))
+    "honeycomb" -> Enum.random(FindMyNeighbour.honeycomb(pid_map,myid))
+    "randhoneycomb" -> Enum.random(FindMyNeighbour.randhoneycomb(pid_map,myid))
     end
-
-    Enum.random(neighbours)
-
   end
 
 end
