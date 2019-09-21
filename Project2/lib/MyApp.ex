@@ -50,8 +50,8 @@ defmodule MyApp do
 
   def checker(pid_map) do
     count = Enum.map(pid_map, fn {k,v} -> Process.info(v) end) |> Enum.count(fn x -> x == nil end)
-    IO.puts("count is ")
-    IO.puts(count)
+    #IO.puts("count is ")
+    #IO.puts(count)
     if count == Enum.count(pid_map) do
       IO.puts("Terminated")
     else

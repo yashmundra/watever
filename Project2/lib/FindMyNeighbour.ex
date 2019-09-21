@@ -6,8 +6,7 @@ defmodule FindMyNeighbour do
   def full(pid_map,myid) do
 	  #returns the neighbouring pids to send msg to  
     #IO.inspect(pid_map)
-    a = Map.values(Map.delete(pid_map,myid))
-    a
+    Map.values(Map.delete(pid_map,myid))
   end
 
   def line(pid_map,myid) do

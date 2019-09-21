@@ -27,8 +27,10 @@ defmodule MyActor do
     #IO.puts("sent rumour to a neighbour")
 
     newcount = count+1
-    IO.puts("new count is ")
-    IO.puts(newcount)
+    #IO.puts("new count is ")
+    #IO.puts(newcount)
+    IO.puts("my id is")
+    IO.puts(myid)
     cond do
       newcount >= 10 -> {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
       newcount < 10 -> {:noreply, {newcount, pid_map,myid,positions,topology}}
