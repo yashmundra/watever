@@ -16,7 +16,7 @@ defmodule MyActor do
   end
 
   #gossip call
-  def handle_call({rumour}, _from, {count,pid_map,myid,positions,topology}) do
+  def handle_cast({rumour}, _from, {count,pid_map,myid,positions,topology}) do
     #select random neighbour and send rumour
     GenServer.call(findmyneighbour(pid_map,myid,topology,positions),{rumour})
     newcount = count+1
@@ -30,12 +30,12 @@ defmodule MyActor do
 
 ###################################################        PUSH SUM   ########################################################################
   #for initializing push sum actors
-  def handle_call({:initialize,s,w,pid_map,myid,positions,topology},_from, _state) do
+  def handle_cast({:initialize,s,w,pid_map,myid,positions,topology},_from, _state) do
     {:noreply,{s,w,nil,nil,pid_map,myid,positions,topology}}
   end
 
   #for push sum call
-  def handle_call({s,w},_from, {s1,w1,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}) do
+  def handle_cast({s,w},_from, {s1,w1,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}) do
     threshold = :math.pow(10,-10)
     new_s = s + s1
     new_w = w + w1
@@ -59,7 +59,7 @@ defmodule MyActor do
     
 
     neighbours = []
-    
+
     case topology do
     'full' -> neighbours = FindMyNeighbour.full(pid_map,myid)
     'line' -> neighbours = FindMyNeighbour.line(pid_map,myid)

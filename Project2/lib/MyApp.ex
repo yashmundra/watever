@@ -31,15 +31,19 @@ defmodule MyApp do
       positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{})
     end
 
-
-    IO.puts("Initializing Genservers and starting distributed communication")
     #Initializing Genservers
     if String.equivalent?(algorithm,"gossip") do
-      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,pid_map,k,positions,topology},:infinity) end)
-      GenServer.call(Map.fetch(pid_map,1),{rumour})
+      IO.puts("Initializing Genservers")
+      Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
+      IO.puts("Starting distributed communication")
+      {:ok,process_id} = Map.fetch(pid_map,1)
+      GenServer.cast(process_id,{rumour})
     else #push sum
-      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,k,w,pid_map,k,positions,topology},:infinity) end)
-      GenServer.call(Map.fetch(pid_map,1),{1,1})
+      IO.puts("Initializing Genservers")
+      Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
+      IO.puts("Starting distributed communication")
+      {:ok,process_id} = Map.fetch(pid_map,1)
+      GenServer.cast(process_id,{1,1})
     end
 
 
