@@ -39,16 +39,16 @@ defmodule FindMyNeighbour do
     end
   end
 
-  def 3Dtorus(pid_map,id) do
+  def torus(pid_map,myid) do
 	#returns the neighbouring pids to send msg to 
  	
   end
 
-  def honeycomb(pid_map,id) do
+  def honeycomb(pid_map,myid) do
 	#returns the neighbouring pids to send msg to 
   end
 
-  def randhoneycomb(pid_map,id) do
+  def randhoneycomb(pid_map,myid) do
 	#returns the neighbouring pids to send msg to 
   end
 

@@ -6,48 +6,68 @@ defmodule MyActor do
   end
   
   def init(state) do
-    #Added Task supervisor to monitor all workers
-    #Supervisor.start_link([{Task.Supervisor, name: MySupervisor}], strategy: :one_for_one)
-    #state is {topology,id}
     {:ok,state}
   end
 
-  def gossip(pid,rumour) do
-    GenServer.call(pid,{rumour})
-  end
-  
-
-  #handles three different types of calls
-  #one to initilize itself
-  #one to receive and handle push sum
-  #one to handle gossip 
-  #maintains internal state which is either a rumor count / or a s,w pair
-  def handle_call({rumour}, _from, state) do
-    #select random and send rumour
-    newstate = state+1
-    #if newstate > 10
-    #{:stop, :normal, state}
-    #else
-    #{:noreply, newstate}
+  #for initializing gossip actors
+  def handle_call({:initialize,rumour,pid_map,myid,positions,topology},_from, _state) do
+    count = 1
+    {:noreply,{count,pid_map,myid,positions, topology}}
   end
 
-  #for push sum
-  def handle_call({s,w},_from, {s1,w1,prev_estimate,prev_prev_estimate}) do
+  #gossip call
+  def handle_call({rumour}, _from, {count,pid_map,myid,positions,topology}) do
+    #select random neighbour and send rumour
+    GenServer.call(findmyneighbour(pid_map,myid,topology,positions),{rumour})
+    newcount = count+1
+    cond do
+      newcount > 10 -> {:stop, :normal, newcount, pid_map,myid,positions,topology}
+      newcount <= 10 -> {:noreply, newcount, pid_map,myid,positions,topology}
+    end
+  end
+
+
+
+###################################################        PUSH SUM   ########################################################################
+  #for initializing push sum actors
+  def handle_call({:initialize,s,w,pid_map,myid,positions,topology},_from, _state) do
+    {:noreply,{s,w,nil,nil,pid_map,myid,positions,topology}}
+  end
+
+  #for push sum call
+  def handle_call({s,w},_from, {s1,w1,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}) do
+    threshold = :math.pow(10,-10)
     new_s = s + s1
     new_w = w + w1
     current_estimate = div(new_s,new_w)
-    #if current_estimate-prev_prev_estimate < threshold
-    #termination code {:stop, :normal, state}
-    #else
-    #prev_prev_estimate = prev_estimate
-    #prev_estimate = current_estimate
-    #select random and send new_s/2,new_w/2
-    #{:noreply,{div(new_s,2),div(new_w,2),prev_estimate,prev_prev_estimate}}
+    
+    if current_estimate-prev_prev_estimate < threshold do
+      {:stop, :normal, {new_s,new_W,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
+    else
+      prev_prev_estimate = prev_estimate
+      prev_estimate = current_estimate
+      GenServer.call(findmyneighbour(pid_map,myid,topology,positions),{div(new_s,2),div(new_w,2)})
+      {:noreply,{div(new_s,2),div(new_w,2),prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
+    end
+
   end
 
-  def handle_call(request,_from, []) do
+ 
+#####################################################     NEIGHBOUR SEARCH   ###################################################################
+
+  def findmyneighbour(pid_map,myid,topology,positions) do
+    
+    case topology do
+    'full' -> neighbours = FindMyNeighbour.full(pid_map,myid)
+    'line' -> neighbours = FindMyNeighbour.line(pid_map,myid)
+    'rand2D' -> neighbours = FindMyNeighbour.rand2D(positions,pid_map,myid)
+    '3Dtorus' -> neighbours = FindMyNeighbour.torus(pid_map,myid)
+    'honeycomb' -> neighbours = FindMyNeighbour.honeycomb(pid_map,myid)
+    'randhoneycomb' -> neighbours = FindMyNeighbour.randhoneycomb(pid_map,myid)
+    end
+
+    Enum.random(neighbours)
 
   end
 
-  
 end
