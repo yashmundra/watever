@@ -41,8 +41,8 @@ defmodule MyActor do
     new_w = w + w1
     current_estimate = div(new_s,new_w)
     
-    if current_estimate-prev_prev_estimate < threshold and prev_prev_estimate!=nil do
-      {:stop, :normal, {new_s,new_W,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
+    if prev_prev_estimate!=nil and current_estimate-prev_prev_estimate < threshold do
+      {:stop, :normal, {new_s,new_w,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
     else
       prev_prev_estimate = prev_estimate
       prev_estimate = current_estimate
@@ -56,6 +56,9 @@ defmodule MyActor do
 #####################################################     NEIGHBOUR SEARCH   ###################################################################
 
   def findmyneighbour(pid_map,myid,topology,positions) do
+    
+
+    neighbours = []
     
     case topology do
     'full' -> neighbours = FindMyNeighbour.full(pid_map,myid)

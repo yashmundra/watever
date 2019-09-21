@@ -3,7 +3,7 @@ defmodule MyApp do
 
   def start(_type, _args) do
     
-    numNodes = Integer.parse(Enum.at(System.argv,0))
+    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
     topology = Enum.at(System.argv,1)
     algorithm = Enum.at(System.argv,2)
     rumour = "Hi"
@@ -26,20 +26,19 @@ defmodule MyApp do
     #return success
     
     IO.puts("Calculating positions")
+    positions = nil
     if String.equivalent?(topology,"rand2D") do
-      positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}}) |> Enum.into(%{})
-    else
-      positions = nil
+      positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{})
     end
 
 
     IO.puts("Initializing Genservers")
     #Initializing Genservers
     if String.equivalent?(algorithm,"gossip") do
-      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,pid_map,k,positions,topology}))
+      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,pid_map,k,positions,topology}) end)
       GenServer.call(Map.fetch(pid_map,1),{rumour})
     else #push sum
-      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,k,w,pid_map,k,positions,topology}))
+      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
       GenServer.call(Map.fetch(pid_map,1),{1,1})
     end
 
@@ -50,7 +49,7 @@ defmodule MyApp do
   end
 
   def checker(pid_map) do
-    count = Enum.map(pid_map, fn {k,v} -> Process.info(v)) |> Enum.count(fn x -> x == nil end)
+    count = Enum.map(pid_map, fn {k,v} -> Process.info(v) end) |> Enum.count(fn x -> x == nil end)
     if count == Enum.count(pid_map) do
       :success
     else
