@@ -58,20 +58,27 @@ defmodule MyApp do
 
 
     IO.puts("Checking for termination and showing process states")
-    show_process_states(pid_map)
-
-    IO.puts "the end"
+    check_for_termination(pid_map)
 
     ret_value
 
   end
 
 
-  def show_process_states(pid_map) do
-    alive_map = Enum.map(pid_map, fn {k,v} -> {k,Process.alive?(v)} end) 
-    IO.puts("The process states are :")
-    IO.inspect(alive_map)
-    show_process_states(pid_map)
+  def check_for_termination(pid_map) do
+    alive_map = Enum.map(pid_map, fn {k,v} -> Process.alive?(v) end) 
+    #IO.puts("The process states are :")
+    #IO.inspect(alive_map)
+    count_of_all_processes = Enum.count(pid_map)
+    count_of_dead_processes = Enum.filter(alive_map, fn x -> x==false end) |> Enum.count()
+    
+    if count_of_all_processes==count_of_dead_processes do
+      IO.puts("All actors have converged")
+    else
+      IO.puts("Trying again in 2 sec")
+      Process.sleep(2000)
+      check_for_termination(pid_map)
+    end
   end
 
   def create_genservers(algorithm, numNodes) do

@@ -27,9 +27,15 @@
     else
       prev_prev_estimate = prev_estimate
       prev_estimate = current_estimate
-      GenServer.call(FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions),{div(new_s,2),div(new_w,2)})
+      neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
+      send_msg_to_neighbours(neighbour_addrs,new_s,new_w)
       {:noreply,{div(new_s,2),div(new_w,2),prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
     end
 
   end
+
+  def send_msg_to_neighbours(neighbour_addrs,new_s,new_w) do
+    Enum.map(neighbour_addrs, fn addr -> GenServer.call(addr,{div(new_s,2),div(new_w,2)}) end )
+  end
+
 end

@@ -53,7 +53,7 @@ defmodule FindMyNeighbour do
     case topology do
     "full" -> FindMyNeighbour.full(pid_map,myid)
     "line" -> FindMyNeighbour.line(pid_map,myid)
-    "rand2D" -> Enum.random(FindMyNeighbour.rand2D(positions,pid_map,myid))
+    "rand2D" -> FindMyNeighbour.rand2D(positions,pid_map,myid)
     "3Dtorus" -> Enum.random(FindMyNeighbour.torus(pid_map,myid))
     "honeycomb" -> Enum.random(FindMyNeighbour.honeycomb(pid_map,myid))
     "randhoneycomb" -> Enum.random(FindMyNeighbour.randhoneycomb(pid_map,myid))
