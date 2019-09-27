@@ -32,14 +32,7 @@ defmodule MyGossipActor do
       {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
     else
       neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
-      #IO.puts "My addr is "
-      #IO.inspect Map.fetch(pid_map,myid)
-      #IO.puts "and neighbour addrs is"
-      #IO.inspect neighbour_addrs
-      #IO.inspect Map.fetch(pid_map,myid)
-      #IO.inspect 
       send_msg_to_neighbours(neighbour_addrs,{rumour})
-      #GenServer.cast(neighbour_addr,{rumour})
       {:noreply, {newcount, pid_map,myid,positions,topology}}
     end
   end

@@ -28,8 +28,8 @@ defmodule MyApp do
     end
     
     if String.equivalent?(topology,"3Dtorus") do
-      #Need to make numNodes is a cube
-      IO.puts "still remaining"
+      #Need to make sure numNodes is a cube
+      numNodes = :math.pow(round(:math.pow(numNodes,0.3333)),3)
     end
 
     IO.puts("Creating Genservers")

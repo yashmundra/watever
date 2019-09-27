@@ -37,7 +37,27 @@ defmodule FindMyNeighbour do
 
   def torus(pid_map,myid) do
 	#returns the neighbouring pids to send msg to 
- 	
+  no_of_processes = Enum.count(pid_map)
+  no_of_layers = no_of_processes |> :math.pow(0.333) |> round()
+  layer_size = :math.pow(no_of_layers,2)
+  #need to find my_layer and my_relative_id
+  if rem(myid,layer_size)==0 do
+    my_relative_id = 9
+  else
+    my_relative_id = rem(myid,layer_size)
+  end
+
+  if my_relative_id == layer_size do
+    my_layer = div(myid,layer_size) 
+  else
+    my_layer = div(myid,layer_size) + 1
+  end
+
+  #three cases of node : corner, face and inside the cube
+  
+  #corner : (relative id 1 or layer_size or no_of_layer or layer_size-no_of_layer ) and layer is 1 or no_of layer
+  #face : 
+
   end
 
   def honeycomb(pid_map,myid) do
@@ -54,9 +74,9 @@ defmodule FindMyNeighbour do
     "full" -> FindMyNeighbour.full(pid_map,myid)
     "line" -> FindMyNeighbour.line(pid_map,myid)
     "rand2D" -> FindMyNeighbour.rand2D(positions,pid_map,myid)
-    "3Dtorus" -> Enum.random(FindMyNeighbour.torus(pid_map,myid))
-    "honeycomb" -> Enum.random(FindMyNeighbour.honeycomb(pid_map,myid))
-    "randhoneycomb" -> Enum.random(FindMyNeighbour.randhoneycomb(pid_map,myid))
+    "3Dtorus" -> FindMyNeighbour.torus(pid_map,myid)
+    "honeycomb" -> FindMyNeighbour.honeycomb(pid_map,myid)
+    "randhoneycomb" -> FindMyNeighbour.randhoneycomb(pid_map,myid)
     end
 
   end
