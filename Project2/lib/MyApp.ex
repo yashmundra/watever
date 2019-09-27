@@ -11,15 +11,29 @@ defmodule MyApp do
     
     children = [
   		{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
-	]
+	    ]
 
-    Supervisor.start_link(children, strategy: :one_for_one)
- 
-    #{id,pid} pid map generated
-    IO.puts("Creating Genservers")
-    a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyActor) end) |> Enum.map(fn {:ok,x} -> x end)
-    pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
+    ret_value = Supervisor.start_link(children, strategy: :one_for_one)
+
+
+    #first make sure numNodes is correct for honeycomb and torus / divisible by 6 and a cube
+    if String.equivalent?(topology,"honeycomb") or String.equivalent?(topology,"randhoneycomb") do
+      remainder = rem(numNodes,6)
+      if rem(numNodes+remainder,6)==0 do
+        numNodes = numNodes+remainder
+      else
+        numNodes = numNodes-remainder
+      end
+
+    end
     
+    if String.equivalent?(topology,"3Dtorus") do
+      #Need to make numNodes is a cube
+      IO.puts "still remaining"
+    end
+
+    IO.puts("Creating Genservers")
+    pid_map = create_genservers(algorithm,numNodes)    
 
     IO.puts("Calculating positions")
     positions = nil
@@ -43,21 +57,33 @@ defmodule MyApp do
     end
 
 
-    IO.puts("Checking for termination")
-    checker(pid_map)
+    IO.puts("Checking for termination and showing process states")
+    show_process_states(pid_map)
+
+    IO.puts "the end"
+
+    ret_value
 
   end
 
-  def checker(pid_map) do
-    count = Enum.map(pid_map, fn {k,v} -> Process.info(v) end) |> Enum.count(fn x -> x == nil end)
-    #IO.puts("count is ")
-    #IO.puts(count)
-    if count == Enum.count(pid_map) do
-      IO.puts("Terminated")
+
+  def show_process_states(pid_map) do
+    alive_map = Enum.map(pid_map, fn {k,v} -> {k,Process.alive?(v)} end) 
+    IO.puts("The process states are :")
+    IO.inspect(alive_map)
+    show_process_states(pid_map)
+  end
+
+  def create_genservers(algorithm, numNodes) do
+    
+    if String.equivalent?(algorithm,"push-sum") do
+      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyPushSumActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     else
-      Process.sleep(2000)
-      checker(pid_map)
+      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyGossipActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     end
+
   end
 
 end

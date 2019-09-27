@@ -3,7 +3,7 @@ defmodule MyApp do
 
   def start(_type, _args) do
     
-    numNodes = Integer.parse(Enum.at(System.argv,0))
+    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
     topology = Enum.at(System.argv,1)
     algorithm = Enum.at(System.argv,2)
     rumour = "Hi"
@@ -11,52 +11,79 @@ defmodule MyApp do
     
     children = [
   		{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
-	]
+	    ]
 
-    Supervisor.start_link(children, strategy: :one_for_one)
- 
-    #{id,pid} pid map generated
+    ret_value = Supervisor.start_link(children, strategy: :one_for_one)
+
+
+    #first make sure numNodes is correct for honeycomb and torus / divisible by 6 and a cube
+    if String.equivalent?(topology,"honeycomb") or String.equivalent?(topology,"randhoneycomb") do
+      remainder = rem(numNodes,6)
+      if rem(numNodes+remainder,6)==0 do
+        numNodes = numNodes+remainder
+      else
+        numNodes = numNodes-remainder
+      end
+
+    end
+    
+    if String.equivalent?(topology,"3Dtorus") do
+      #Need to make numNodes is a cube
+      IO.puts "still remaining"
+    end
+
     IO.puts("Creating Genservers")
-    a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyActor) end) |> Enum.map(fn {:ok,x} -> x end)
-    pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
-    
-    #initilaize the actors with the topology, pidmap and their id
-    #pick one and send thema  rumor
-    #wait and collect terminations from every actor
-    #return success
-    
+    pid_map = create_genservers(algorithm,numNodes)    
+
     IO.puts("Calculating positions")
+    positions = nil
     if String.equivalent?(topology,"rand2D") do
-      positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}}) |> Enum.into(%{})
-    else
-      positions = nil
+      positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{})
     end
 
-
-    IO.puts("Initializing Genservers")
     #Initializing Genservers
-    if String.equivalent?(algorithm,"gossip") do
-      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,pid_map,k,positions,topology}))
-      GenServer.call(Map.fetch(pid_map,1),{rumour})
+    if String.equivalent?(algorithm,"gossip") do #for gossip
+      IO.puts("Initializing Genservers")
+      Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
+      IO.puts("Starting distributed communication")
+      {:ok,process_id} = Map.fetch(pid_map,1)
+      GenServer.cast(process_id,{rumour})
     else #push sum
-      Enum.each(pid_map,fn {k,v} -> GenServer.call(v,{:initialize,k,w,pid_map,k,positions,topology}))
-      GenServer.call(Map.fetch(pid_map,1),{1,1})
+      IO.puts("Initializing Genservers")
+      Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
+      IO.puts("Starting distributed communication")
+      {:ok,process_id} = Map.fetch(pid_map,1)
+      GenServer.cast(process_id,{1,1})
     end
 
 
-    IO.puts("Checking for termination")
-    checker(pid_map)
+    IO.puts("Checking for termination and showing process states")
+    #show_process_states(pid_map)
+
+    IO.puts "the end"
+
+    ret_value
 
   end
 
-  def checker(pid_map) do
-    count = Enum.map(pid_map, fn {k,v} -> Process.info(v)) |> Enum.count(fn x -> x == nil end)
-    if count == Enum.count(pid_map) do
-      :success
+
+  def show_process_states(pid_map) do
+    alive_map = Enum.map(pid_map, fn {k,v} -> {k,Process.alive?(v)} end) 
+    IO.puts("The process states are :")
+    IO.inspect(alive_map)
+    show_process_states(pid_map)
+  end
+
+  def create_genservers(algorithm, numNodes) do
+    
+    if String.equivalent?(algorithm,"push-sum") do
+      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyPushSumActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     else
-      Process.sleep(2000)
-      checker(pid_map)
+      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyGossipActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     end
+
   end
 
 end
