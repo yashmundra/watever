@@ -36,27 +36,45 @@ defmodule FindMyNeighbour do
   end
 
   def torus(pid_map,myid) do
-	#returns the neighbouring pids to send msg to 
-  no_of_processes = Enum.count(pid_map)
-  no_of_layers = no_of_processes |> :math.pow(0.333) |> round()
-  layer_size = :math.pow(no_of_layers,2)
-  #need to find my_layer and my_relative_id
-  if rem(myid,layer_size)==0 do
-    my_relative_id = 9
-  else
+	# returns the neighbouring pids to send msg to 
+    no_of_processes = Enum.count(pid_map)
+    no_of_layers = no_of_processes |> :math.pow(0.333) |> round()
+    layer_size = :math.pow(no_of_layers,2)
+  # #need to find my_layer and my_relative_id
+    if rem(myid,layer_size)==0 do
+     my_relative_id = layer_size
+   else
     my_relative_id = rem(myid,layer_size)
-  end
+   end
 
-  if my_relative_id == layer_size do
-    my_layer = div(myid,layer_size) 
-  else
-    my_layer = div(myid,layer_size) + 1
-  end
+   if my_relative_id == layer_size do
+     my_layer = div(myid,layer_size) 
+   else
+     my_layer = div(myid,layer_size) + 1
+   end
 
-  #three cases of node : corner, face and inside the cube
+  # #approach
+  # #can we just do id+1,id+no+of+layer,next layer and prev_layer, 
+
+  # #three cases of node : corner, face and inside the cube
   
-  #corner : (relative id 1 or layer_size or no_of_layer or layer_size-no_of_layer ) and layer is 1 or no_of layer
-  #face : 
+  # # corner : (relative id 1 or layer_size or no_of_layer or layer_size-no_of_layer ) and (layer is 1 or no_of layer)
+  # # face : (relative id is non corner and layer is 1 or no_of_layer) or (relative id is 2,4,6,8 and layer is non outisde)
+  
+  # #outside_ids = Enum.map_every(1..layer_size-no_of_layers+1, fn x -> Range.new(x,x+no_of_layers-1) end )
+  
+  # #if my_layer == 1 or my_layer==no_of_layer do 
+  # #outside face
+  # #else
+  # #  if my_relative_id == 1 
+  # #end
+
+  # #for a particular relative id , we can find 2,3 or 4 neighbour on the same lvel
+
+  #find x, y and z of a node in the lattice
+  #formula
+  #x-1 and x+1 if edges x-1+cuberoot , x+1 - cuberoot
+
 
   end
 
