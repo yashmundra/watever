@@ -32,6 +32,8 @@ defmodule MyGossipActor do
       {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
     else
       neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
+      #IO.puts "neighbour addresse sis "
+      #IO.inspect neighbour_addrs
       send_msg_to_neighbours(neighbour_addrs,{rumour})
       {:noreply, {newcount, pid_map,myid,positions,topology}}
     end
