@@ -130,9 +130,7 @@ defmodule FindMyNeighbour do
   end
 
   def convert_x_y_to_id(x,y)
-
-    12*
-
+    12 + (y-1)*6 + x
   end
 
   def honey_nebors(x,y) do
@@ -161,7 +159,9 @@ defmodule FindMyNeighbour do
   end
 
   def randhoneycomb(pid_map,myid) do
-	#returns the neighbouring pids to send msg to 
+	  #returns the neighbouring pids to send msg to 
+    random_pid = Enum.random(Map.values(Map.delete(pid_map,myid)))
+    Enum.concat(FindMyNeighbour.honeycomb(pid_map,myid),[random_pid])
   end
 
   def findmyneighbour(pid_map,myid,topology,positions) do
