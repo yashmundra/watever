@@ -66,11 +66,11 @@ defmodule FindMyNeighbour do
   def convert_id_to_xyz(myid, no_of_layers, layer_size) do
     #x and y are determined by relative id 
     # z is determined by 
-    relative_id = rem(myid, layer_size+1)
+    rel_id = rem(myid, layer_size+1)
 
-    x = rem(rel_id-1,no_of_layer)
+    x = rem(rel_id-1,no_of_layers)
 
-    y = div(rel_id-1,no_of_layer)
+    y = div(rel_id-1,no_of_layers)
    
     z = div(myid-1,layer_size)
 
@@ -90,32 +90,45 @@ defmodule FindMyNeighbour do
     #hardcode c and r for top and bottom 12
     #for else c and r odd 
     next_to_last_id = Enum.count(pid_map) + 1
-    case myid do
-      1 -> nebors = [2,4]
-      2 -> nebors = [1,5]
-      3 -> nebors = [4,8]
-      4 -> nebors = [1,3,9]
-      5 -> nebors = [2,6,10]
-      6 -> nebors = [5,11]
-      7 -> nebors = [8,13]
-      8 -> nebors = [3,7,14]
-      9 -> nebors = [4,10,15]
-      10 -> nebors = [5,9,16]
-      11 -> nebors = [6,12,17]
-      12 -> nebors = [11,18]
-      next_to_last_id-1 -> nebors = [next_to_last_id-2,next_to_last_id-4]
-      next_to_last_id-2 -> nebors = [next_to_last_id-1,next_to_last_id-5]
-      next_to_last_id-3 -> nebors = [next_to_last_id-4,next_to_last_id-8]
-      next_to_last_id-4 -> nebors = [next_to_last_id-1,next_to_last_id-3,next_to_last_id-9]
-      next_to_last_id-5 -> nebors = [next_to_last_id-2,next_to_last_id-6,next_to_last_id-10]
-      next_to_last_id-6 -> nebors = [next_to_last_id-5,next_to_last_id-11]
-      next_to_last_id-7 -> nebors = [next_to_last_id-8,next_to_last_id-13]
-      next_to_last_id-8 -> nebors = [next_to_last_id-3,next_to_last_id-7,next_to_last_id-14]
-      next_to_last_id-9 -> nebors = [next_to_last_id-4,next_to_last_id-10,next_to_last_id-15]
-      next_to_last_id-10 -> nebors = [next_to_last_id-5,next_to_last_id-9,next_to_last_id-16]
-      next_to_last_id-11 -> nebors = [next_to_last_id-6,next_to_last_id-12,next_to_last_id-17]
-      next_to_last_id-12 -> nebors = [next_to_last_id-11,next_to_last_id-18]
-      _ -> nebors = honey_nebors(find_x_and_y(myid,next_to_last_id))
+    try_1 = next_to_last_id-1
+    try_2 = next_to_last_id-2
+    try_3 = next_to_last_id-3
+    try_4 = next_to_last_id-4
+    try_5 = next_to_last_id-5
+    try_6 = next_to_last_id-6
+    try_7 = next_to_last_id-7
+    try_8 = next_to_last_id-8
+    try_9 = next_to_last_id-9
+    try_10 = next_to_last_id-10
+    try_11 = next_to_last_id-11
+    try_12 = next_to_last_id-12
+    
+    nebors = case myid do
+      1 -> [2,4]
+      2 -> [1,5]
+      3 -> [4,8]
+      4 -> [1,3,9]
+      5 -> [2,6,10]
+      6 -> [5,11]
+      7 -> [8,13]
+      8 -> [3,7,14]
+      9 -> [4,10,15]
+      10 -> [5,9,16]
+      11 -> [6,12,17]
+      12 -> [11,18]
+      try_1 -> [next_to_last_id-2,next_to_last_id-4]
+      try_2 -> [next_to_last_id-1,next_to_last_id-5]
+      try_3 -> [next_to_last_id-4,next_to_last_id-8]
+      try_4 -> [next_to_last_id-1,next_to_last_id-3,next_to_last_id-9]
+      try_5 -> [next_to_last_id-2,next_to_last_id-6,next_to_last_id-10]
+      try_6 -> [next_to_last_id-5,next_to_last_id-11]
+      try_7 -> [next_to_last_id-8,next_to_last_id-13]
+      try_8 -> [next_to_last_id-3,next_to_last_id-7,next_to_last_id-14]
+      try_9 -> [next_to_last_id-4,next_to_last_id-10,next_to_last_id-15]
+      try_10 -> [next_to_last_id-5,next_to_last_id-9,next_to_last_id-16]
+      try_11 -> [next_to_last_id-6,next_to_last_id-12,next_to_last_id-17]
+      try_12 -> [next_to_last_id-11,next_to_last_id-18]
+      _ -> honey_nebors(find_x_and_y(myid))
       
     end
 
@@ -123,7 +136,7 @@ defmodule FindMyNeighbour do
 
   end
 
-  def find_x_and_y(myid,next_to_last_id) do
+  def find_x_and_y(myid) do
     newid = myid - 12
 
     x = if rem(newid,6)==0 do 6 else rem(newid,6) end
