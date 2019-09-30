@@ -20,6 +20,8 @@ defmodule FindMyNeighbour do
 
   def rand2D(positions,pid_map,myid) do
 	  #positions is mapping of id to position {x,y}
+    #IO.puts "My positions are "
+    #IO.inspect positions
 	  {:ok,myposition} = Map.fetch(positions,myid)
 	  ids_to_check = Map.delete(pid_map,myid) |> Map.keys()
 	  Enum.filter(ids_to_check,fn id -> check_threshold(elem(Map.fetch(positions,id),1),myposition,0.1) end) |> Enum.map(fn id-> elem(Map.fetch(pid_map,id),1) end)
@@ -41,7 +43,7 @@ defmodule FindMyNeighbour do
     #myids run from 1 to n
     no_of_processes = Enum.count(pid_map)
     no_of_layers = no_of_processes |> :math.pow(0.333) |> round()
-    layer_size = :math.pow(no_of_layers,2)
+    layer_size = round(:math.pow(no_of_layers,2))
     
     #find x , y and z
     {x,y,z} = convert_id_to_xyz(myid,no_of_layers, layer_size)

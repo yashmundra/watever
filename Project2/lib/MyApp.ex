@@ -24,7 +24,7 @@ defmodule MyApp do
                 numNodes + 24
                 else 
                   if String.equivalent?(topology,"3Dtorus") do
-                    :math.pow(round(:math.pow(numNodes,0.3333)),3) 
+                    round(:math.pow(round(:math.pow(numNodes,0.3333)),3))
                   else
                     {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
                     numNodes
@@ -42,11 +42,15 @@ defmodule MyApp do
     pid_map = create_genservers(algorithm,numNodes)    
 
     IO.puts("Calculating positions")
-    positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{}) end
+    positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(),:rand.uniform()}} end) |> Enum.into(%{}) end
+    #IO.puts "The generated positions are "
+    #IO.inspect positions
+
 
     #Initializing Genservers
     if String.equivalent?(algorithm,"gossip") do #for gossip
       IO.puts("Initializing Genservers")
+      #{:initialize,s,w,pid_map,myid,positions,topology}
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
       {:ok,process_id} = Map.fetch(pid_map,1)
@@ -74,6 +78,7 @@ defmodule MyApp do
     #IO.inspect(alive_map)
     count_of_all_processes = Enum.count(pid_map)
     count_of_dead_processes = Enum.filter(alive_map, fn x -> x==false end) |> Enum.count()
+
     
     if count_of_all_processes==count_of_dead_processes do
       IO.puts("All actors have converged")

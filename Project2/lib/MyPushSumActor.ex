@@ -37,7 +37,7 @@
   end
 
   def send_msg_to_neighbours(neighbour_addrs,new_s,new_w) do
-    Enum.map(neighbour_addrs, fn addr -> GenServer.call(addr,{div(new_s,2),div(new_w,2)}) end )
+    Enum.map(neighbour_addrs, fn addr -> GenServer.cast(addr,{div(new_s,2),div(new_w,2)}) end )
   end
 
 end
