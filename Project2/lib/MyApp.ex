@@ -25,6 +25,9 @@ defmodule MyApp do
         numNodes = numNodes-remainder
       end
 
+      #to make calculations easy
+      numNodes = numNodes + 24
+
     end
     
     if String.equivalent?(topology,"3Dtorus") do

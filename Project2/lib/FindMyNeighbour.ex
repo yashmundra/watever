@@ -85,7 +85,79 @@ defmodule FindMyNeighbour do
   end
 
   def honeycomb(pid_map,myid) do
-	#returns the neighbouring pids to send msg to 
+	  #returns the neighbouring pids to send msg to 
+    #convert id to c and r 
+    #hardcode c and r for top and bottom 12
+    #for else c and r odd 
+    next_to_last_id = Enum.count(pid_map) + 1
+    case myid do
+      1 -> nebors = [2,4]
+      2 -> nebors = [1,5]
+      3 -> nebors = [4,8]
+      4 -> nebors = [1,3,9]
+      5 -> nebors = [2,6,10]
+      6 -> nebors = [5,11]
+      7 -> nebors = [8,13]
+      8 -> nebors = [3,7,14]
+      9 -> nebors = [4,10,15]
+      10 -> nebors = [5,9,16]
+      11 -> nebors = [6,12,17]
+      12 -> nebors = [11,18]
+      next_to_last_id-1 -> nebors = [next_to_last_id-2,next_to_last_id-4]
+      next_to_last_id-2 -> nebors = [next_to_last_id-1,next_to_last_id-5]
+      next_to_last_id-3 -> nebors = [next_to_last_id-4,next_to_last_id-8]
+      next_to_last_id-4 -> nebors = [next_to_last_id-1,next_to_last_id-3,next_to_last_id-9]
+      next_to_last_id-5 -> nebors = [next_to_last_id-2,next_to_last_id-6,next_to_last_id-10]
+      next_to_last_id-6 -> nebors = [next_to_last_id-5,next_to_last_id-11]
+      next_to_last_id-7 -> nebors = [next_to_last_id-8,next_to_last_id-13]
+      next_to_last_id-8 -> nebors = [next_to_last_id-3,next_to_last_id-7,next_to_last_id-14]
+      next_to_last_id-9 -> nebors = [next_to_last_id-4,next_to_last_id-10,next_to_last_id-15]
+      next_to_last_id-10 -> nebors = [next_to_last_id-5,next_to_last_id-9,next_to_last_id-16]
+      next_to_last_id-11 -> nebors = [next_to_last_id-6,next_to_last_id-12,next_to_last_id-17]
+      next_to_last_id-12 -> nebors = [next_to_last_id-11,next_to_last_id-18]
+      _ -> nebors = honey_nebors(find_x_and_y(myid,next_to_last_id))
+      
+    end
+
+    Enum.map(nebors, fn id-> Map.fetch(pid_map,id) end)
+
+  end
+
+  def find_x_and_y(myid,next_to_last_id) do
+    rel_id = myid - 12
+
+
+  end
+
+  def convert_x_y_to_id(x,y)
+
+    12*
+
+  end
+
+  def honey_nebors(x,y) do
+
+    #if y is odd and even and y is 1-6, x's go from 1 to 6, y's go from 1 to n
+    if div(y,2)==0 do #second row
+      case x do
+        1 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)]
+        2 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
+        3 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)]
+        4 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
+        5 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)]
+        6 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
+      end
+    else #first row
+      case x do
+        1 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1)]
+        2 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)]
+        3 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
+        4 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)] 
+        5 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
+        6 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1)]
+      end
+    end
+
   end
 
   def randhoneycomb(pid_map,myid) do
