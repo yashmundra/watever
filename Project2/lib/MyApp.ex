@@ -22,10 +22,21 @@ defmodule MyApp do
                 numNodes = if rem(numNodes+remainder,6)==0 do numNodes+remainder else numNodes-remainder end
                 #to make calculations easy
                 numNodes + 24
+                else 
+                  if String.equivalent?(topology,"3Dtorus") do
+                    :math.pow(round(:math.pow(numNodes,0.3333)),3) 
+                  else
+                    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
+                    numNodes
+                  end
                 end
+
+    #cond do
+    #  String.equivalent?(topology,"honeycomb") or String.equivalent?(topology,"randhoneycomb") -> 
+    #end
     
     #Need to make sure numNodes is a cube
-    numNodes = if String.equivalent?(topology,"3Dtorus") do :math.pow(round(:math.pow(numNodes,0.3333)),3) end
+    #numNodes = if String.equivalent?(topology,"3Dtorus") do :math.pow(round(:math.pow(numNodes,0.3333)),3) end
 
     IO.puts("Creating Genservers")
     pid_map = create_genservers(algorithm,numNodes)    
