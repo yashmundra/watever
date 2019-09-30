@@ -26,6 +26,7 @@ defmodule MyGossipActor do
     #Needs to be modified so mesage is sent to all in case of full
 
     newcount = count+1
+    #IO.puts "my id is #{myid} "
 
     if newcount >= 10 do
       IO.puts("I am stopping now")
