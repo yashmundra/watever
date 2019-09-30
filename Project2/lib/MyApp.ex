@@ -31,20 +31,12 @@ defmodule MyApp do
                   end
                 end
 
-    #cond do
-    #  String.equivalent?(topology,"honeycomb") or String.equivalent?(topology,"randhoneycomb") -> 
-    #end
-    
-    #Need to make sure numNodes is a cube
-    #numNodes = if String.equivalent?(topology,"3Dtorus") do :math.pow(round(:math.pow(numNodes,0.3333)),3) end
-
     IO.puts("Creating Genservers")
     pid_map = create_genservers(algorithm,numNodes)    
 
     IO.puts("Calculating positions")
     positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(),:rand.uniform()}} end) |> Enum.into(%{}) end
-    #IO.puts "The generated positions are "
-    #IO.inspect positions
+
 
 
     #Initializing Genservers
@@ -59,7 +51,9 @@ defmodule MyApp do
       IO.puts("Initializing Genservers")
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
-      {:ok,process_id} = Map.fetch(pid_map,1)
+      {:ok,process_id} = Map.fetch(pid_map,1) #picking random process actor
+      #IO.puts "my process id is"
+      #IO.inspect process_id
       GenServer.cast(process_id,{1,1})
     end
 

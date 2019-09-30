@@ -12,17 +12,19 @@
   
   #for initializing push sum actors
   def handle_cast({:initialize,s,w,pid_map,myid,positions,topology},_state) do
+    #IO.puts "initialization message received"
     {:noreply,{s,w,nil,nil,pid_map,myid,positions,topology}}
   end
 
   #for push sum call
-  def handle_cast({s,w},_from, {s1,w1,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}) do
+  def handle_cast({s,w}, {s1,w1,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}) do
     threshold = :math.pow(10,-10)
     new_s = s + s1
     new_w = w + w1
     current_estimate = div(new_s,new_w)
+    #IO.puts "message received"
     
-    if prev_prev_estimate!=nil and current_estimate-prev_prev_estimate < threshold do
+    if (prev_prev_estimate != nil) and (current_estimate-prev_prev_estimate < threshold) do
       IO.puts "Stopping push sum actor"
       {:stop, :normal, {new_s,new_w,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
     else
