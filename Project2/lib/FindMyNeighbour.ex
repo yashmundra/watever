@@ -54,12 +54,12 @@ defmodule FindMyNeighbour do
   def torus_func(a,x,y,z,n) do
     #a represent the a'th neighbour of the node in question
     case a do
-    1 -> if x+1 > n do {0,y,z} else {x+1,y,z}
-    2 -> if x-1 < 0 do {n,y,z} else {x-1,y,z}
-    3 -> if y+1 > n do {x,0,z} else {x,y+1,z}
-    4 -> if y-1 < 0 do {x,n,z} else {x,y-1,z}
-    5 -> if z+1 > n do {x,y,0} else {x,y,z+1}
-    6 -> if z-1 < 0 do {x,y,n} else {x,y,z-1}
+    1 -> if x+1 > n do {0,y,z} else {x+1,y,z} end
+    2 -> if x-1 < 0 do {n,y,z} else {x-1,y,z} end
+    3 -> if y+1 > n do {x,0,z} else {x,y+1,z} end
+    4 -> if y-1 < 0 do {x,n,z} else {x,y-1,z} end
+    5 -> if z+1 > n do {x,y,0} else {x,y,z+1} end
+    6 -> if z-1 < 0 do {x,y,n} else {x,y,z-1} end
     end
   end
 
@@ -124,16 +124,21 @@ defmodule FindMyNeighbour do
   end
 
   def find_x_and_y(myid,next_to_last_id) do
-    rel_id = myid - 12
+    newid = myid - 12
 
+    x = if rem(newid,6)==0 do 6 else rem(newid,6) end
+
+    y = if rem(newid,6)==0 do div(newid,6) else div(newid,6) + 1 end
+
+    {x,y}
 
   end
 
-  def convert_x_y_to_id(x,y)
+  def convert_x_y_to_id(x,y) do
     12 + (y-1)*6 + x
   end
 
-  def honey_nebors(x,y) do
+  def honey_nebors({x,y}) do
 
     #if y is odd and even and y is 1-6, x's go from 1 to 6, y's go from 1 to n
     if div(y,2)==0 do #second row
