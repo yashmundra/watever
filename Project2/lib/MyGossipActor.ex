@@ -26,12 +26,15 @@ defmodule MyGossipActor do
     #Needs to be modified so mesage is sent to all in case of full
 
     newcount = count+1
+    #IO.puts "my id is #{myid} "
 
     if newcount >= 10 do
       IO.puts("I am stopping now")
       {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
     else
       neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
+      #IO.puts "sending to following"
+      #IO.inspect neighbour_addrs
       send_msg_to_neighbours(neighbour_addrs,{rumour})
       {:noreply, {newcount, pid_map,myid,positions,topology}}
     end

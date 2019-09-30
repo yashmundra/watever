@@ -1,0 +1,80 @@
+Creating Genservers
+Calculating positions
+Initializing Genservers
+Starting distributed communication
+Checking for termination and showing process states
+my id is 1 and my current estimate is 1
+Trying again in 2 sec
+neighbour addrs is 
+my id is 2 and my current estimate is 1
+my id is 3 and my current estimate is 2
+my id is 4 and my current estimate is 2
+my id is 5 and my current estimate is 3
+my id is 6 and my current estimate is 3
+my id is 7 and my current estimate is 4
+my id is 8 and my current estimate is 4
+my id is 9 and my current estimate is 5
+my id is 10 and my current estimate is 5
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+my id is 3 and my current estimate is 1
+my id is 4 and my current estimate is 1
+my id is 5 and my current estimate is 2
+my id is 6 and my current estimate is 2
+my id is 7 and my current estimate is 2
+my id is 8 and my current estimate is 2
+my id is 9 and my current estimate is 3
+my id is 10 and my current estimate is 3
+my id is 1 and my current estimate is 1
+my id is 2 and my current estimate is 1
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+my id is 6 and my current estimate is 2
+my id is 7 and my current estimate is 2
+neighbour addrs is 
+my id is 9 and my current estimate is 2
+my id is 3 and my current estimate is 1
+my id is 10 and my current estimate is 2
+my id is 4 and my current estimate is 1
+my id is 8 and my current estimate is 2
+my id is 5 and my current estimate is 2
+neighbour addrs is 
+my id is 2 and my current estimate is 1
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+neighbour addrs is 
+my id is 1 and my current estimate is 1
+neighbour addrs is 
+neighbour addrs is 
+my id is 6 and my current estimate is 2
+my id is 3 and my current estimate is 2
+my id is 7 and my current estimate is 2
+my id is 9 and my current estimate is 2
+my id is 10 and my current estimate is 2
+my id is 5 and my current estimate is 2
+my id is 8 and my current estimate is 2
+neighbour addrs is 
+my id is 4 and my current estimate is 2
+neighbour addrs is 
+neighbour addrs is 
+my id is 10 and my current estimate is 2
+my id is 9 and my current estimate is 2
+neighbour addrs is 
+my id is 3 and my current estimate is 2
+All actors have converged

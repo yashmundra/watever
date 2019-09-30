@@ -17,29 +17,21 @@ defmodule MyApp do
 
 
     #first make sure numNodes is correct for honeycomb and torus / divisible by 6 and a cube
-    if String.equivalent?(topology,"honeycomb") or String.equivalent?(topology,"randhoneycomb") do
-      remainder = rem(numNodes,6)
-      if rem(numNodes+remainder,6)==0 do
-        numNodes = numNodes+remainder
-      else
-        numNodes = numNodes-remainder
-      end
-
-    end
+    numNodes =  if String.equivalent?(topology,"honeycomb") or String.equivalent?(topology,"randhoneycomb") do
+                remainder = rem(numNodes,6)
+                numNodes = if rem(numNodes+remainder,6)==0 do numNodes+remainder else numNodes-remainder end
+                #to make calculations easy
+                numNodes + 24
+                end
     
-    if String.equivalent?(topology,"3Dtorus") do
-      #Need to make numNodes is a cube
-      IO.puts "still remaining"
-    end
+    #Need to make sure numNodes is a cube
+    numNodes = if String.equivalent?(topology,"3Dtorus") do :math.pow(round(:math.pow(numNodes,0.3333)),3) end
 
     IO.puts("Creating Genservers")
     pid_map = create_genservers(algorithm,numNodes)    
 
     IO.puts("Calculating positions")
-    positions = nil
-    if String.equivalent?(topology,"rand2D") do
-      positions = Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{})
-    end
+    positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{}) end
 
     #Initializing Genservers
     if String.equivalent?(algorithm,"gossip") do #for gossip
@@ -58,20 +50,27 @@ defmodule MyApp do
 
 
     IO.puts("Checking for termination and showing process states")
-    #show_process_states(pid_map)
-
-    IO.puts "the end"
+    check_for_termination(pid_map)
 
     ret_value
 
   end
 
 
-  def show_process_states(pid_map) do
-    alive_map = Enum.map(pid_map, fn {k,v} -> {k,Process.alive?(v)} end) 
-    IO.puts("The process states are :")
-    IO.inspect(alive_map)
-    show_process_states(pid_map)
+  def check_for_termination(pid_map) do
+    alive_map = Enum.map(pid_map, fn {k,v} -> Process.alive?(v) end) 
+    #IO.puts("The process states are :")
+    #IO.inspect(alive_map)
+    count_of_all_processes = Enum.count(pid_map)
+    count_of_dead_processes = Enum.filter(alive_map, fn x -> x==false end) |> Enum.count()
+    
+    if count_of_all_processes==count_of_dead_processes do
+      IO.puts("All actors have converged")
+    else
+      IO.puts("Trying again in 2 sec")
+      Process.sleep(2000)
+      check_for_termination(pid_map)
+    end
   end
 
   def create_genservers(algorithm, numNodes) do
