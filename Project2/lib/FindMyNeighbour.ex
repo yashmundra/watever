@@ -4,18 +4,18 @@ defmodule FindMyNeighbour do
   #ids start from 1
 
   def full(pid_map,myid) do
-	  #returns the neighbouring pids to send msg to  
+	  #returns the neighbouring pids to send msg to
     #IO.inspect(pid_map)
     Map.values(Map.delete(pid_map,myid))
   end
 
   def line(pid_map,myid) do
-	#returns the neighbouring pids to send msg to 
+	#returns the neighbouring pids to send msg to
     cond do
       myid==1 -> [elem(Map.fetch(pid_map,2),1)]
       myid==map_size(pid_map) -> [elem(Map.fetch(pid_map,myid-1),1)]
 	    true -> [elem(Map.fetch(pid_map,myid-1),1),elem(Map.fetch(pid_map,myid+1),1)]
-    end      
+    end
   end
 
   def rand2D(positions,pid_map,myid) do
@@ -38,14 +38,14 @@ defmodule FindMyNeighbour do
   end
 
   def torus(pid_map,myid) do
-	  # returns the neighbouring pids to send msg to 
+	  # returns the neighbouring pids to send msg to
     #the torus dimensions are assumed to be from 0,0,0 to n,n,n so layers are n+1
     #myids run from 1 to n
     IO.puts "AM i here"
     no_of_processes = Enum.count(pid_map)
     no_of_layers = no_of_processes |> :math.pow(0.333) |> round()
     layer_size = round(:math.pow(no_of_layers,2))
-    
+
     #find x , y and z
     {x,y,z} = convert_id_to_xyz(myid,no_of_layers, layer_size)
 
@@ -69,14 +69,14 @@ defmodule FindMyNeighbour do
   end
 
   def convert_id_to_xyz(myid, no_of_layers, layer_size) do
-    #x and y are determined by relative id 
-    # z is determined by 
+    #x and y are determined by relative id
+    # z is determined by
     rel_id = rem(myid, layer_size+1)
 
     x = rem(rel_id-1,no_of_layers)
 
     y = div(rel_id-1,no_of_layers)
-   
+
     z = div(myid-1,layer_size)
 
     {x,y,z}
@@ -89,11 +89,34 @@ defmodule FindMyNeighbour do
 
   end
 
+  # honeycomb:
+
+  def honey_neborss(c, r, maxc, maxr) do
+    cond do
+      c == 0 and r == 0 -> nebors = [nebor(c, r+1, maxc, maxr)]
+      c == 0 and div(r,2) == 0 -> nebors = [nebor(c, r+1, maxc, maxr), nebor(c, r-1, maxc, maxr)]
+      c == 0 and div(r,2) != 0 -> nebors = [nebor(c, r+1, maxc, maxr), nebor(c, r-1, maxc, maxr), nebor(c+1, r, maxc, maxr)]
+      r == 0 and div(c,2) == 0 -> nebors = [nebor(c, r+1, maxc, maxr), nebor(c-1, r, maxc, maxr)]
+      r == 0 and div(c,2) != 0 -> nebors = [nebor(c, r+1, maxc, maxr), nebor(c+1, r, maxc, maxr)]
+      div(c,2) == 0 and div(r,2) == 0 -> nebors = [nebor(c, r+1, maxc, maxr), nebor(c, r-1, maxc, maxr), nebor(c-1, r, maxc, maxr)]
+      div(c,2) != 0 and div(r,2) != 0 -> nebors = [nebor(c, r+1, maxc, maxr), nebor(c, r-1, maxc, maxr), nebor(c-1, r, maxc, maxr)]
+      true -> nebors = [nebor(c, r-1, maxc, maxr), nebor(c, r+1, maxc, maxr), nebor(c+1, r, maxc, maxr)]
+    end
+  end
+
+  def nebor(c, r, maxc, maxr) do
+    cond do
+      c >= 0 and r >= 0 and c < maxc and r < maxr -> {c, r}
+    end
+  end
+
+  #end honeycomb here
+
   def honeycomb(pid_map,myid) do
-	  #returns the neighbouring pids to send msg to 
-    #convert id to c and r 
+	  #returns the neighbouring pids to send msg to
+    #convert id to c and r
     #hardcode c and r for top and bottom 12
-    #for else c and r odd 
+    #for else c and r odd
     next_to_last_id = Enum.count(pid_map) + 1
     try_1 = next_to_last_id-1
     try_2 = next_to_last_id-2
@@ -107,7 +130,7 @@ defmodule FindMyNeighbour do
     try_10 = next_to_last_id-10
     try_11 = next_to_last_id-11
     try_12 = next_to_last_id-12
-    
+
     nebors = case myid do
       1 -> [2,4]
       2 -> [1,5]
@@ -134,7 +157,7 @@ defmodule FindMyNeighbour do
       try_11 -> [next_to_last_id-6,next_to_last_id-12,next_to_last_id-17]
       try_12 -> [next_to_last_id-11,next_to_last_id-18]
       _ -> honey_nebors(find_x_and_y(myid))
-      
+
     end
 
     Enum.map(nebors, fn id-> elem(Map.fetch(pid_map,id),1) end)
@@ -173,7 +196,7 @@ defmodule FindMyNeighbour do
         1 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1)]
         2 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)]
         3 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
-        4 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)] 
+        4 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x+1,y)]
         5 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1),convert_x_y_to_id(x-1,y)]
         6 -> [convert_x_y_to_id(x,y-1),convert_x_y_to_id(x,y+1)]
       end
@@ -182,7 +205,7 @@ defmodule FindMyNeighbour do
   end
 
   def randhoneycomb(pid_map,myid) do
-	  #returns the neighbouring pids to send msg to 
+	  #returns the neighbouring pids to send msg to
     random_pid = Enum.random(Map.values(Map.delete(pid_map,myid)))
     Enum.concat(FindMyNeighbour.honeycomb(pid_map,myid),[random_pid])
   end
