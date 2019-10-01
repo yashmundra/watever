@@ -17,17 +17,10 @@ defmodule MyGossipActor do
   end
 
   def handle_cast({rumour}, {count,pid_map,myid,positions,topology}) do
-    #select random neighbour and send rumour
-    #IO.puts("received rumour")
-    #GenServer.cast(findmyneighbour(pid_map,myid,topology,positions),{rumour})
-    #GenServer.cast(process_id,{rumour})
-    #IO.puts("sent rumour to a neighbour")
-
-    #Needs to be modified so mesage is sent to all in case of full
 
     newcount = count+1
     #IO.puts "my id is #{myid} "
-
+    #neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
     if newcount >= 10 do
       IO.puts("I am stopping now")
       {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
@@ -35,8 +28,19 @@ defmodule MyGossipActor do
       neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
       #IO.puts "sending to following"
       #IO.inspect neighbour_addrs
-      send_msg_to_neighbours(neighbour_addrs,{rumour})
-      {:noreply, {newcount, pid_map,myid,positions,topology}}
+      #if neighbour_Addr are all dead then kill yourself
+      nebor_state = Enum.map(neighbour_addrs, fn addr -> Process.alive?(addr) end)
+
+      #if all neighbours are dead then die too
+      IO.puts "nebor state is "
+      IO.inspect nebor_state
+      
+      if Enum.all?(nebor_state, fn x -> x==false end) do
+          {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
+      else
+          send_msg_to_neighbours(neighbour_addrs,{rumour})
+          {:noreply, {newcount, pid_map,myid,positions,topology}}
+      end
     end
   end
 

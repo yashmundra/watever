@@ -9,9 +9,9 @@ defmodule MyApp do
     rumour = "Hi"
     w = 1
     
-    children = [
-  		{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
-	    ]
+    children = []
+  	#	{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
+	  #  ]
 
     ret_value = Supervisor.start_link(children, strategy: :one_for_one)
 

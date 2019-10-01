@@ -25,6 +25,7 @@ defmodule FindMyNeighbour do
 	  {:ok,myposition} = Map.fetch(positions,myid)
 	  ids_to_check = Map.delete(pid_map,myid) |> Map.keys()
 	  Enum.filter(ids_to_check,fn id -> check_threshold(elem(Map.fetch(positions,id),1),myposition,0.1) end) |> Enum.map(fn id-> elem(Map.fetch(pid_map,id),1) end)
+  
   end
 
   def check_threshold(pos1,pos2,threshold) do
@@ -49,7 +50,11 @@ defmodule FindMyNeighbour do
     #find x , y and z
     {x,y,z} = convert_id_to_xyz(myid,no_of_layers, layer_size)
 
-    Enum.map(1..6, fn a-> torus_func(a,x,y,z,no_of_layers-1) end) |> Enum.map(fn a-> convert_xyz_to_id(a, no_of_layers,layer_size) end) |> Enum.map(fn id-> elem(Map.fetch(pid_map,id),1) end)
+    a1 = Enum.map(1..6, fn a-> torus_func(a,x,y,z,no_of_layers-1) end) 
+    a2 = Enum.map(a1,fn a-> convert_xyz_to_id(a, no_of_layers,layer_size) end) 
+    #IO.puts "a2 is sksksksksk"
+    #IO.inspect a2
+    Enum.map(a2, fn i-> elem(Map.fetch(pid_map,i),1) end)
 
     #IO.puts "torus addresses are "
     #IO.inspect ab

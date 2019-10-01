@@ -23,10 +23,12 @@
   def create_genservers(algorithm, numNodes) do
     
     if String.equivalent?(algorithm,"push-sum") do
-      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyPushSumActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      #a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyPushSumActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      a = Enum.map(1..numNodes, fn x -> GenServer.start_link(MyPushSumActor,[]) end) |> Enum.map(fn {:ok,x} -> x end)
       pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     else
-      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyGossipActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      #a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyGossipActor) end) |> Enum.map(fn {:ok,x} -> x end)
+      a = Enum.map(1..numNodes, fn x -> GenServer.start_link(MyGossipActor,[]) end) |> Enum.map(fn {:ok,x} -> x end)
       pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
     end
 
