@@ -7,18 +7,19 @@ defmodule Proj2.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      escript: escript()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
-  def application do
-    [
-      Application.start(Proj2),
-      extra_applications: [:logger],
-      mod: {MyApp,[]}
-    ]
-  end
+  #def application do
+  #  [
+   #   Application.start(Proj2),
+  #    extra_applications: [:logger],
+   #   mod: {MyApp,[]}
+  #  ]
+  #end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
@@ -27,4 +28,9 @@ defmodule Proj2.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
   end
+
+  def escript do
+    [main_module: MyApp]
+  end
+
 end

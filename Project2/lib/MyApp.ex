@@ -1,13 +1,11 @@
 defmodule MyApp do
-  use Application
+  def main(args) do
 
-  def start(_type, _args) do
-
+    #{numNodes, topology, algorithm} = OptionParser.parse(args)
+    {[], [numNodes, topology, algorithm], []} = OptionParser.parse(args)
     prev = System.monotonic_time(:second)
     
-    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
-    topology = Enum.at(System.argv,1)
-    algorithm = Enum.at(System.argv,2)
+    {numNodes, ""} = Integer.parse(numNodes)
     rumour = "Hi"
     w = 1
     
@@ -28,13 +26,13 @@ defmodule MyApp do
                   if String.equivalent?(topology,"3Dtorus") do
                     round(:math.pow(round(:math.pow(numNodes,0.3333)),3))
                   else
-                    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
+                    #{numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
                     numNodes
                   end
                 end
 
     IO.puts("Creating Genservers")
-    pid_map = create_genservers(algorithm,numNodes)    
+    pid_map = Misc.create_genservers(algorithm,numNodes)    
 
     IO.puts("Calculating positions")
     positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(),:rand.uniform()}} end) |> Enum.into(%{}) end
@@ -60,43 +58,10 @@ defmodule MyApp do
     end
 
 
-    IO.puts("Checking for termination and showing process states")
-    check_for_termination(pid_map,prev)
+    IO.puts("Checking for termination")
+    Misc.check_for_termination(pid_map,prev)
 
     ret_value
-
-  end
-
-
-  def check_for_termination(pid_map,prev) do
-    alive_map = Enum.map(pid_map, fn {k,v} -> Process.alive?(v) end) 
-    #IO.puts("The process states are :")
-    #IO.inspect(alive_map)
-    count_of_all_processes = Enum.count(pid_map)
-    count_of_dead_processes = Enum.filter(alive_map, fn x -> x==false end) |> Enum.count()
-
-    
-    if count_of_all_processes==count_of_dead_processes do
-      next = System.monotonic_time(:second)
-      IO.puts("All actors have converged and time taken to converge is ")
-      diff = next - prev
-      IO.inspect diff
-    else
-      IO.puts("Trying again in 0.5 sec")
-      Process.sleep(500)
-      check_for_termination(pid_map,prev)
-    end
-  end
-
-  def create_genservers(algorithm, numNodes) do
-    
-    if String.equivalent?(algorithm,"push-sum") do
-      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyPushSumActor) end) |> Enum.map(fn {:ok,x} -> x end)
-      pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
-    else
-      a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyGossipActor) end) |> Enum.map(fn {:ok,x} -> x end)
-      pid_map = Enum.zip(1..numNodes,a) |> Enum.into(%{})
-    end
 
   end
 

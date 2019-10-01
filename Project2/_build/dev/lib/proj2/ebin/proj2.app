@@ -1,9 +1,7 @@
 {application,proj2,
-             [{applications,[kernel,stdlib,elixir,logger]},
+             [{applications,[kernel,stdlib,elixir]},
               {description,"proj2"},
-              {modules,['Elixir.FindMyNeighbour','Elixir.MyApp',
+              {modules,['Elixir.FindMyNeighbour','Elixir.Misc','Elixir.MyApp',
                         'Elixir.MyGossipActor','Elixir.MyPushSumActor']},
               {registered,[]},
-              {vsn,"0.1.0"},
-              {error,{"no such file or directory","Elixir.Proj2.app"}},
-              {mod,{'Elixir.MyApp',[]}}]}.
+              {vsn,"0.1.0"}]}.
