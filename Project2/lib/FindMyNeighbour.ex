@@ -90,57 +90,45 @@ defmodule FindMyNeighbour do
 
   end
 
-  def honeycomb(pid_map,myid) do
-	  #returns the neighbouring pids to send msg to 
-    #convert id to c and r 
-    #hardcode c and r for top and bottom 12
-    #for else c and r odd 
-    next_to_last_id = Enum.count(pid_map) + 1
-    try_1 = next_to_last_id-1
-    try_2 = next_to_last_id-2
-    try_3 = next_to_last_id-3
-    try_4 = next_to_last_id-4
-    try_5 = next_to_last_id-5
-    try_6 = next_to_last_id-6
-    try_7 = next_to_last_id-7
-    try_8 = next_to_last_id-8
-    try_9 = next_to_last_id-9
-    try_10 = next_to_last_id-10
-    try_11 = next_to_last_id-11
-    try_12 = next_to_last_id-12
-    
-    nebors = case myid do
-      1 -> [2,4]
-      2 -> [1,5]
-      3 -> [4,8]
-      4 -> [1,3,9]
-      5 -> [2,6,10]
-      6 -> [5,11]
-      7 -> [8,13]
-      8 -> [3,7,14]
-      9 -> [4,10,15]
-      10 -> [5,9,16]
-      11 -> [6,12,17]
-      12 -> [11,18]
-      try_1 -> [next_to_last_id-2,next_to_last_id-4]
-      try_2 -> [next_to_last_id-1,next_to_last_id-5]
-      try_3 -> [next_to_last_id-4,next_to_last_id-8]
-      try_4 -> [next_to_last_id-1,next_to_last_id-3,next_to_last_id-9]
-      try_5 -> [next_to_last_id-2,next_to_last_id-6,next_to_last_id-10]
-      try_6 -> [next_to_last_id-5,next_to_last_id-11]
-      try_7 -> [next_to_last_id-8,next_to_last_id-13]
-      try_8 -> [next_to_last_id-3,next_to_last_id-7,next_to_last_id-14]
-      try_9 -> [next_to_last_id-4,next_to_last_id-10,next_to_last_id-15]
-      try_10 -> [next_to_last_id-5,next_to_last_id-9,next_to_last_id-16]
-      try_11 -> [next_to_last_id-6,next_to_last_id-12,next_to_last_id-17]
-      try_12 -> [next_to_last_id-11,next_to_last_id-18]
-      _ -> honey_nebors(find_x_and_y(myid))
-      
-    end
-
-    Enum.map(nebors, fn id-> elem(Map.fetch(pid_map,id),1) end)
-
+  def honeycomb(pid_map,myid) do  
+    no_of_processes = Enum.count(pid_map)
+    #find x and y
+    {c,r} = convert_id_to_cr(myid)
+    h_nebor = honey_nebors(c,r,no_of_processes)
+    h_nebor = List.delete(h_nebor,0)
+    Enum.map(h_nebor, fn id -> elem(Map.fetch(pid_map,id),1) end)
   end
+
+  def convert_cr_to_id({c,r}) do
+    c * 10 + r + 1
+  end
+
+  def convert_id_to_cr(myid) do
+    c = div(myid - 1,10)
+    r = rem(myid - 1,10)
+    {c,r}
+  end
+
+  def honey_nebors(c,r,no_of_processes) do
+    cond do
+    c==0 and r==0 -> nebors = [nebor(c,r+1,no_of_processes)]
+    c==0 and div(r,2)==0 -> nebors = [nebor(c,r+1,no_of_processes),nebor(c,r-1,no_of_processes)]
+    c == 0 and div(r,2) != 0 -> nebors = [nebor(c, r+1, no_of_processes), nebor(c, r-1, no_of_processes), nebor(c+1, r, no_of_processes)]
+    r == 0 and div(c,2) == 0 -> nebors = [nebor(c, r+1, no_of_processes), nebor(c-1, r, no_of_processes)]
+    r == 0 and div(c,2) != 0 -> nebors = [nebor(c, r+1, no_of_processes), nebor(c+1, r, no_of_processes)]
+    div(c,2) == 0 and div(r,2) == 0 -> nebors = [nebor(c, r+1, no_of_processes), nebor(c, r-1, no_of_processes), nebor(c-1, r, no_of_processes)]
+    div(c,2) != 0 and div(r,2) != 0 -> nebors = [nebor(c, r+1, no_of_processes), nebor(c, r-1, no_of_processes), nebor(c-1, r, no_of_processes)]
+    true -> nebors = [nebor(c, r-1, no_of_processes), nebor(c, r+1, no_of_processes), nebor(c+1, r, no_of_processes)]
+    end
+  end
+
+  def nebor(c,r,no_of_processes) do
+    cond do
+      c>=0 and r>=0 and c*10+r+1<no_of_processes -> convert_cr_to_id{c,r}
+      true -> 0
+    end
+  end
+
 
   def find_x_and_y(myid) do
     newid = myid - 12
