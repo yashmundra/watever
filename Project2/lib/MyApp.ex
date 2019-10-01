@@ -33,6 +33,9 @@ defmodule MyApp do
                   end
                 end
 
+    #IO.puts "numnodes are"
+    #IO.inspect numNodes
+
     IO.puts("Creating Genservers")
     pid_map = Misc.create_genservers(algorithm,numNodes)    
 

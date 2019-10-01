@@ -42,7 +42,7 @@ defmodule FindMyNeighbour do
 	  # returns the neighbouring pids to send msg to 
     #the torus dimensions are assumed to be from 0,0,0 to n,n,n so layers are n+1
     #myids run from 1 to n
-    IO.puts "AM i here"
+    #IO.puts "AM i here"
     no_of_processes = Enum.count(pid_map)
     no_of_layers = no_of_processes |> :math.pow(0.333) |> round()
     layer_size = round(:math.pow(no_of_layers,2))
@@ -52,9 +52,9 @@ defmodule FindMyNeighbour do
 
     a1 = Enum.map(1..6, fn a-> torus_func(a,x,y,z,no_of_layers-1) end) 
     a2a = Enum.map(a1,fn {x,y,z}-> convert_xyz_to_id({x,y,z}, no_of_layers,layer_size) end) 
-    IO.puts "a2a is"
-    IO.inspect a2a
-    Enum.map(a2a, fn id-> Map.fetch(pid_map,id) end) |> Enum.filter(fn x-> x==:error end) |> Enum.map(fn {:ok,x} -> x end)
+    #IO.puts "a2a is"
+    #IO.inspect Enum.map(a2a, fn id-> Map.fetch(pid_map,id) end) |> Enum.map(fn {:ok,x} -> x end)
+    Enum.map(a2a, fn id-> Map.fetch(pid_map,id) end) |> Enum.map(fn {:ok,x} -> x end)
   end
 
   def torus_func(a,x,y,z,n) do

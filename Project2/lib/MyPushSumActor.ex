@@ -25,11 +25,11 @@
     #IO.puts "my id is #{myid} and my current estimate is #{current_estimate}"
     
     if (prev_prev_estimate != nil) and (abs(current_estimate-prev_prev_estimate) < threshold) do
-      IO.puts "Stopping push-sum actor"
-      IO.puts prev_prev_estimate
-      IO.puts "current est - prev prev est and threshld"
-      IO.inspect abs(current_estimate-prev_prev_estimate)
-      IO.inspect threshold
+      #IO.puts "Stopping push-sum actor"
+      #IO.puts prev_prev_estimate
+      #IO.puts "current est - prev prev est and threshld"
+      #IO.inspect abs(current_estimate-prev_prev_estimate)
+      #IO.inspect threshold
       {:stop, :normal, {new_s,new_w,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
     else
       prev_prev_estimate = prev_estimate
