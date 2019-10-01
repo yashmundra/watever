@@ -2,6 +2,8 @@ defmodule MyApp do
   use Application
 
   def start(_type, _args) do
+
+    prev = System.monotonic_time()
     
     {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
     topology = Enum.at(System.argv,1)
@@ -22,20 +24,27 @@ defmodule MyApp do
                 numNodes = if rem(numNodes+remainder,6)==0 do numNodes+remainder else numNodes-remainder end
                 #to make calculations easy
                 numNodes + 24
+                else 
+                  if String.equivalent?(topology,"3Dtorus") do
+                    round(:math.pow(round(:math.pow(numNodes,0.3333)),3))
+                  else
+                    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
+                    numNodes
+                  end
                 end
-    
-    #Need to make sure numNodes is a cube
-    numNodes = if String.equivalent?(topology,"3Dtorus") do :math.pow(round(:math.pow(numNodes,0.3333)),3) end
 
     IO.puts("Creating Genservers")
     pid_map = create_genservers(algorithm,numNodes)    
 
     IO.puts("Calculating positions")
-    positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(2)-1,:rand.uniform(2)-1}} end) |> Enum.into(%{}) end
+    positions = if String.equivalent?(topology,"rand2D") do Enum.map(pid_map,fn {k,v} -> {k,{:rand.uniform(),:rand.uniform()}} end) |> Enum.into(%{}) end
+
+
 
     #Initializing Genservers
     if String.equivalent?(algorithm,"gossip") do #for gossip
       IO.puts("Initializing Genservers")
+      #{:initialize,s,w,pid_map,myid,positions,topology}
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
       {:ok,process_id} = Map.fetch(pid_map,1)
@@ -44,32 +53,38 @@ defmodule MyApp do
       IO.puts("Initializing Genservers")
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
-      {:ok,process_id} = Map.fetch(pid_map,1)
+      {:ok,process_id} = Map.fetch(pid_map,1) #picking random process actor
+      #IO.puts "my process id is"
+      #IO.inspect process_id
       GenServer.cast(process_id,{1,1})
     end
 
 
     IO.puts("Checking for termination and showing process states")
-    check_for_termination(pid_map)
+    check_for_termination(pid_map,prev)
 
     ret_value
 
   end
 
 
-  def check_for_termination(pid_map) do
+  def check_for_termination(pid_map,prev) do
     alive_map = Enum.map(pid_map, fn {k,v} -> Process.alive?(v) end) 
     #IO.puts("The process states are :")
     #IO.inspect(alive_map)
     count_of_all_processes = Enum.count(pid_map)
     count_of_dead_processes = Enum.filter(alive_map, fn x -> x==false end) |> Enum.count()
+
     
     if count_of_all_processes==count_of_dead_processes do
-      IO.puts("All actors have converged")
+      next = System.monotonic_time()
+      IO.puts("All actors have converged and time taken to converge is ")
+      diff = next - prev
+      IO.inspect diff
     else
       IO.puts("Trying again in 2 sec")
       Process.sleep(2000)
-      check_for_termination(pid_map)
+      check_for_termination(pid_map,prev)
     end
   end
 

@@ -2,6 +2,8 @@ defmodule MyApp do
   use Application
 
   def start(_type, _args) do
+
+    prev = System.monotonic_time(:second)
     
     {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
     topology = Enum.at(System.argv,1)
@@ -59,14 +61,14 @@ defmodule MyApp do
 
 
     IO.puts("Checking for termination and showing process states")
-    check_for_termination(pid_map)
+    check_for_termination(pid_map,prev)
 
     ret_value
 
   end
 
 
-  def check_for_termination(pid_map) do
+  def check_for_termination(pid_map,prev) do
     alive_map = Enum.map(pid_map, fn {k,v} -> Process.alive?(v) end) 
     #IO.puts("The process states are :")
     #IO.inspect(alive_map)
@@ -75,11 +77,14 @@ defmodule MyApp do
 
     
     if count_of_all_processes==count_of_dead_processes do
-      IO.puts("All actors have converged")
+      next = System.monotonic_time(:second)
+      IO.puts("All actors have converged and time taken to converge is ")
+      diff = next - prev
+      IO.inspect diff
     else
-      IO.puts("Trying again in 2 sec")
-      Process.sleep(2000)
-      check_for_termination(pid_map)
+      IO.puts("Trying again in 0.5 sec")
+      Process.sleep(500)
+      check_for_termination(pid_map,prev)
     end
   end
 
