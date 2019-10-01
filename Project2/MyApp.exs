@@ -50,6 +50,7 @@ defmodule MyApp do
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
       {:ok,process_id} = Map.fetch(pid_map,1)
+      #Process.sleep(2000)
       GenServer.cast(process_id,{rumour})
     else #push sum
       IO.puts("Initializing Genservers")
@@ -58,6 +59,7 @@ defmodule MyApp do
       {:ok,process_id} = Map.fetch(pid_map,1) #picking random process actor
       #IO.puts "my process id is"
       #IO.inspect process_id
+      #Process.sleep(2000)
       GenServer.cast(process_id,{1,1})
     end
 

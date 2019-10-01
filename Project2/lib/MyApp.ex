@@ -8,10 +8,12 @@ defmodule MyApp do
     {numNodes, ""} = Integer.parse(numNodes)
     rumour = "Hi"
     w = 1
+    #IO.puts "Topology is"
+    #IO.inspect topology
     
-    children = []
-  	#	{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
-	  #  ]
+    children = [
+  		{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
+	    ]
 
     ret_value = Supervisor.start_link(children, strategy: :one_for_one)
 
@@ -51,7 +53,8 @@ defmodule MyApp do
       IO.puts("Initializing Genservers")
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
-      {:ok,process_id} = Map.fetch(pid_map,1) #picking random process actor
+      {:ok,process_id} = Map.fetch(pid_map,1) 
+      #picking random process actor
       #IO.puts "my process id is"
       #IO.inspect process_id
       GenServer.cast(process_id,{1,1})

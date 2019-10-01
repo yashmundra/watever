@@ -51,14 +51,10 @@ defmodule FindMyNeighbour do
     {x,y,z} = convert_id_to_xyz(myid,no_of_layers, layer_size)
 
     a1 = Enum.map(1..6, fn a-> torus_func(a,x,y,z,no_of_layers-1) end) 
-    a2 = Enum.map(a1,fn a-> convert_xyz_to_id(a, no_of_layers,layer_size) end) 
-    #IO.puts "a2 is sksksksksk"
-    #IO.inspect a2
-    Enum.map(a2, fn i-> elem(Map.fetch(pid_map,i),1) end)
-
-    #IO.puts "torus addresses are "
-    #IO.inspect ab
-
+    a2a = Enum.map(a1,fn {x,y,z}-> convert_xyz_to_id({x,y,z}, no_of_layers,layer_size) end) 
+    IO.puts "a2a is"
+    IO.inspect a2a
+    Enum.map(a2a, fn id-> Map.fetch(pid_map,id) end) |> Enum.filter(fn x-> x==:error end) |> Enum.map(fn {:ok,x} -> x end)
   end
 
   def torus_func(a,x,y,z,n) do

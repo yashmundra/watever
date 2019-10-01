@@ -35,12 +35,10 @@
       prev_prev_estimate = prev_estimate
       prev_estimate = current_estimate
       neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
-      #IO.puts "neighbour addrs is "
-      #IO.inspect neighbour_addrs
 
-      nebor_state = Enum.map(neighbour_addrs, fn addr -> Process.alive?(addr) end)
+      neighbour_addrs = Enum.filter(neighbour_addrs, fn addr -> Process.alive?(addr) end)
       
-      if Enum.all?(nebor_state, fn x -> x==false end) do
+      if Enum.empty?(neighbour_addrs) do
           {:stop, :normal, {new_s,new_w,prev_estimate,prev_prev_estimate,pid_map,myid,positions,topology}}
       else
           #IO.inspect current_estimate

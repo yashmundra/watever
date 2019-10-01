@@ -19,6 +19,7 @@ defmodule MyGossipActor do
   def handle_cast({rumour}, {count,pid_map,myid,positions,topology}) do
 
     newcount = count+1
+    IO.puts newcount
     #IO.puts "my id is #{myid} "
     #neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
     if newcount >= 10 do
@@ -26,18 +27,21 @@ defmodule MyGossipActor do
       {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
     else
       neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
-      #IO.puts "sending to following"
-      #IO.inspect neighbour_addrs
+      
+      IO.puts "before nebor state is "
+      IO.inspect neighbour_addrs
       #if neighbour_Addr are all dead then kill yourself
-      nebor_state = Enum.map(neighbour_addrs, fn addr -> Process.alive?(addr) end)
+      neighbour_addrs = Enum.filter(neighbour_addrs, fn addr -> Process.alive?(addr) end)
 
       #if all neighbours are dead then die too
-      IO.puts "nebor state is "
-      IO.inspect nebor_state
-      
-      if Enum.all?(nebor_state, fn x -> x==false end) do
+      #IO.puts "after nebor state is "
+      IO.inspect neighbour_addrs
+
+      if Enum.empty?(neighbour_addrs) do
+          IO.puts "Its all false"
           {:stop, :normal, {newcount, pid_map,myid,positions,topology}}
       else
+          IO.puts "Sending msg to people"
           send_msg_to_neighbours(neighbour_addrs,{rumour})
           {:noreply, {newcount, pid_map,myid,positions,topology}}
       end
