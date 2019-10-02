@@ -3,7 +3,7 @@ defmodule MyApp do
 
     #{numNodes, topology, algorithm} = OptionParser.parse(args)
     {[], [numNodes, topology, algorithm], []} = OptionParser.parse(args)
-    prev = System.monotonic_time(:second)
+    prev = System.monotonic_time(:millisecond)
     
     {numNodes, ""} = Integer.parse(numNodes)
     rumour = "Hi"

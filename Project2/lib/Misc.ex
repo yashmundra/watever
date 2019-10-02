@@ -9,13 +9,13 @@
 
     
     if count_of_all_processes==count_of_dead_processes do
-      next = System.monotonic_time(:second)
-      IO.puts("All actors have converged and time taken to converge is ")
+      next = System.monotonic_time(:millisecond)
+      IO.puts("All actors have converged and time taken to converge is milliseconds")
       diff = next - prev
       IO.inspect diff
     else
-      IO.puts("Trying again in 2 sec")
-      Process.sleep(2000)
+      IO.puts("Trying again in 0.2 sec")
+      Process.sleep(200)
       check_for_termination(pid_map,prev)
     end
   end

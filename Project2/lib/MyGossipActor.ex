@@ -19,7 +19,7 @@ defmodule MyGossipActor do
   def handle_cast({rumour}, {count,pid_map,myid,positions,topology}) do
 
     newcount = count+1
-    IO.puts newcount
+    #IO.puts newcount
     #IO.puts "my id is #{myid} "
     #neighbour_addrs = FindMyNeighbour.findmyneighbour(pid_map,myid,topology,positions)
     if newcount >= 10 do
@@ -30,7 +30,7 @@ defmodule MyGossipActor do
       
       #IO.puts "before nebor state is "
       #IO.inspect neighbour_addrs
-      #if neighbour_Addr are all dead then kill yourself
+      #if neighbour_addr are all dead then kill yourself
       neighbour_addrs = Enum.filter(neighbour_addrs, fn addr -> Process.alive?(addr) end)
 
       #if all neighbours are dead then die too

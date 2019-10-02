@@ -1,0 +1,54 @@
+Creating Genservers
+Calculating positions
+Initializing Genservers
+Starting distributed communication
+Checking for termination
+The process states are :
+AM i here
+a2a is
+[true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+[2, 3, 4, 7, 10, 19]
+Its all false
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
+The process states are :
+[false, true, true, true, true, true, true, true, true, true, true, true, true,
+ true, true, true, true, true, true, true, true, true, true, true, true, true,
+ true]
+Trying again in 2 sec
