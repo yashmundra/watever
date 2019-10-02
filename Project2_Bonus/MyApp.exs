@@ -1,17 +1,15 @@
 defmodule MyApp do
-  
   def main(args) do
 
-    {numNodes, topology, algorithm} = OptionParser.parse(args)
-    prev = System.monotonic_time(:second)
+    #{numNodes, topology, algorithm} = OptionParser.parse(args)
+    {[], [numNodes, topology, algorithm], []} = OptionParser.parse(args)
+    prev = System.monotonic_time(:millisecond)
     
-    #{numNodes, ""} = {1, ""}#Integer.parse(Enum.at(System.argv,0))
-    #topology = 2#Enum.at(System.argv,1)
-    #algorithm = 3#Enum.at(System.argv,2)
-    IO.puts "arguamnt are"
-    IO.inspect OptionParser.parse(args)
+    {numNodes, ""} = Integer.parse(numNodes)
     rumour = "Hi"
     w = 1
+    #IO.puts "Topology is"
+    #IO.inspect topology
     
     children = [
   		{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
@@ -30,10 +28,13 @@ defmodule MyApp do
                   if String.equivalent?(topology,"3Dtorus") do
                     round(:math.pow(round(:math.pow(numNodes,0.3333)),3))
                   else
-                    {numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
+                    #{numNodes, ""} = Integer.parse(Enum.at(System.argv,0))
                     numNodes
                   end
                 end
+
+    #IO.puts "numnodes are"
+    #IO.inspect numNodes
 
     IO.puts("Creating Genservers")
     pid_map = Misc.create_genservers(algorithm,numNodes)    
@@ -50,16 +51,15 @@ defmodule MyApp do
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
       {:ok,process_id} = Map.fetch(pid_map,1)
-      #Process.sleep(2000)
       GenServer.cast(process_id,{rumour})
     else #push sum
       IO.puts("Initializing Genservers")
       Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,k,w,pid_map,k,positions,topology}) end)
       IO.puts("Starting distributed communication")
-      {:ok,process_id} = Map.fetch(pid_map,1) #picking random process actor
+      {:ok,process_id} = Map.fetch(pid_map,1) 
+      #picking random process actor
       #IO.puts "my process id is"
       #IO.inspect process_id
-      #Process.sleep(2000)
       GenServer.cast(process_id,{1,1})
     end
 

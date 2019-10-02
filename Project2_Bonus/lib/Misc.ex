@@ -10,7 +10,7 @@
     
     if count_of_all_processes==count_of_dead_processes do
       next = System.monotonic_time(:millisecond)
-      IO.puts("All actors have converged and time taken to converge is milliseconds")
+      IO.puts("All actors have converged and time taken to converge in milliseconds is")
       diff = next - prev
       IO.inspect diff
     else
