@@ -8,12 +8,13 @@ defmodule MyApp do
     numRequests = elem(Integer.parse(Enum.at(System.argv,1)),0)
     #IO.puts GenServer.call(:My,{min,max})
     
+    mymessages = ['hello','world','bye','shit','goddamn','duck','suck','puck','luck','tuck']
 
     children = [{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}]
 
     ret_value = Supervisor.start_link(children, strategy: :one_for_one)
 
-    pids = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
+    nodeid_pid_map = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
     
     #Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
     #  IO.puts("Starting distributed communication")
