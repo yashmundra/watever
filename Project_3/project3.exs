@@ -13,7 +13,7 @@ defmodule MyApp do
 
     ret_value = Supervisor.start_link(children, strategy: :one_for_one)
 
-    pids = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, Node) end) |> Enum.map(fn {:ok,x} -> x end)
+    #a = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, MyGossipActor) end) |> Enum.map(fn {:ok,x} -> x end)
     
     #      Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
     #  IO.puts("Starting distributed communication")

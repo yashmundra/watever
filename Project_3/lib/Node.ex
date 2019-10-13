@@ -1,4 +1,4 @@
-defmodule MyGossipActor do
+defmodule Node do
   use GenServer
 
   def start_link(default) do
@@ -11,10 +11,10 @@ defmodule MyGossipActor do
 
 
   #for initializing gossip actors
-  def handle_cast({:initialize,pid_map,myid,positions,topology},_state) do
-    count = 0
-    {:noreply,{count,pid_map,myid,positions, topology}}
-  end
+  #def handle_cast({:initialize,pid_map,myid,positions,topology},_state) do
+  #  count = 0
+  #  {:noreply,{count,pid_map,myid,positions, topology}}
+  #end
 
   def handle_cast({rumour}, {count,pid_map,myid,positions,topology}) do
 
@@ -48,9 +48,9 @@ defmodule MyGossipActor do
     end
   end
 
-  def send_msg_to_neighbours(neighbour_addrs,msg) do
-    Enum.map(neighbour_addrs, fn addr -> GenServer.cast(addr,msg) end )
-  end
+  # def send_msg_to_neighbours(neighbour_addrs,msg) do
+  #   Enum.map(neighbour_addrs, fn addr -> GenServer.cast(addr,msg) end )
+  # end
 
 
 end
