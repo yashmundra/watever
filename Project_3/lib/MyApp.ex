@@ -20,10 +20,11 @@ defmodule MyApp do
     Enum.each(pids, fn pid -> RealNode.initialize(pid,pid_to_nodeid_map[pid]) end)
 
     #setting nodes up with random neighbours 
-    Enum.each(pids, fn pid -> RealNode.setNeighbour(pid,Enum.take_random(pids,3)))
+    #Make sure that the current node pid is removed from the set that we randmly select from
+    Enum.each(pids, fn pid -> RealNode.setNeighbour(pid,Enum.drop(Enum.take_random(pids,3)) end)
 
     #publish messages randomly to the nodes
-    Enum.each(pids, fn pid -> )
+    Enum.each(pids, fn pid -> RealNode.publishObject(pid,Enum.random(mymessages)) end)
 
     # So Myapp will have a list of messages and it will initilize a set of nodes with these messages and then find messages from each node based on 
     # how many numRequests specified . 
@@ -52,6 +53,7 @@ defmodule MyApp do
   end
 
   def hashStuff(x) do
+    #returns 64 digits of nonsense
     :crypto.hash(:sha256, x) |> Base.encode16    
   end
 end

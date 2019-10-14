@@ -38,36 +38,44 @@ defmodule RealNode do
     end
 
     #SERVER API
-    #routing table will be a keyword map with level values mapping to enums with nil in slots where no entry
+    #routing table will be a keyword map with level values mapping to enums with nil in slots where no entry and {nodeid,pid} otherwise
+    #message to node map will store node as key and list of messages that node has
 
-    def handle_cast({:publishObj,msg}, {list_of_local_messages, routing_table, node_id}) do
+    def handle_cast({:publishObj,msg}, {node_to_message_map, routing_table, node_id}) do
       
-      {:noreply, {list_of_local_messages, routing_table, node_id}}
+      {:noreply, {node_to_message_map, routing_table, node_id}}
     end
 
-    def handle_cast({:unpublishObj,msg},{list_of_local_messages, routing_table, node_id}) do
+    def handle_cast({:unpublishObj,msg},{node_to_message_map, routing_table, node_id}) do
       
-      {:noreply, {list_of_local_messages, routing_table, node_id}}
+      {:noreply, {node_to_message_map, routing_table, node_id}}
     end
     
-    def handle_cast({:routeToObj,obj_id},{list_of_local_messages, routing_table, node_id}) do
+    def handle_cast({:routeToObj,obj_id},{node_to_message_map, routing_table, node_id}) do
       
-      {:noreply, {list_of_local_messages, routing_table, node_id}}
+      {:noreply, {node_to_message_map, routing_table, node_id}}
     end
 
-    def handle_cast({:routeToNode,node_id,exact},{list_of_local_messages, routing_table, node_id}) do
+    def handle_cast({:routeToNode,node_id,exact},{node_to_message_map, routing_table, node_id}) do
       
-      {:noreply, {list_of_local_messages, routing_table, node_id}}
+      {:noreply, {node_to_message_map, routing_table, node_id}}
     end
 
-    def handle_cast({:initialize,n_id},{list_of_local_messages, routing_table, node_id}) do
-      {:noreply, {[], %{}, n_id}}
+    def handle_cast({:initialize,n_id},{node_to_message_map, routing_table, node_id}) do
+
+      #64 routing levels and 16 slots . levels are zero indexed
+      routing_row = Enum.map(1..16, fn x-> nil end)
+      my_routing_table = Enum.each(0..63, fn x-> {x,routing_row} end) |> Enum.into(%{})
+
+      {:noreply, {%{}, my_routing_table, n_id}}
     end
     
-    def handle_cast({:setNbor,list_of_neighbour_pids},{list_of_local_messages, routing_table, node_id}) do
+    def handle_cast({:setNbor,list_of_neighbour_pids},{node_to_message_map, routing_table, node_id}) do
       #update routing table
+      #updates = Enum.each(list_of_neighbour_pids, fn pid -> {MyApp.hashStuff(pid),pid} end)
+      #Enum.each(updates, fn {n,p} -> M)
       
-      {:noreply, {list_of_local_messages, routing_table, node_id}}
+      {:noreply, {node_to_message_map, routing_table, node_id}}
     end
 
 end
