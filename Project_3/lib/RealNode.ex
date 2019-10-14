@@ -38,9 +38,11 @@ defmodule RealNode do
     end
 
     #SERVER API
+
     #routing table will be a keyword map with level values mapping to enums with nil in slots where no entry and {nodeid,pid} otherwise
     #message to node map will store message as key and list of nodes that have that objects data
     #root node for an object needs to be figured out beforehand in a determininstic fashion
+    #convert casts to calls so can wait for the root node to be discovered and a call cahin to be resolved
 
     ##################################### PUBLISH ####################################################
 
