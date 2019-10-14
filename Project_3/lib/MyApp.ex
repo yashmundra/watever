@@ -2,11 +2,9 @@ defmodule MyApp do
   use Application
 
   def start(_type, _args) do
-    #{:ok,pid} = GenServer.start_link(MyGenServer, [:hi], name: :My)
     
     numNodes = elem(Integer.parse(Enum.at(System.argv,0)),0)
     numRequests = elem(Integer.parse(Enum.at(System.argv,1)),0)
-    #IO.puts GenServer.call(:My,{min,max})
     
     mymessages = ['hello','world','bye','shit','goddamn','duck','suck','puck','luck','tuck']
 
@@ -14,12 +12,18 @@ defmodule MyApp do
 
     ret_value = Supervisor.start_link(children, strategy: :one_for_one)
 
-    nodeid_pid_map = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
+    pids = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
     
-    #Enum.each(pid_map,fn {k,v} -> GenServer.cast(v,{:initialize,pid_map,k,positions,topology}) end)
-    #  IO.puts("Starting distributed communication")
-    #  {:ok,process_id} = Map.fetch(pid_map,1)
-    #GenServer.cast(process_id,{rumour})
+    pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(pid)} end) |> Enum.into(%{})
+
+    #initializing nodes with their unique id's
+    Enum.each(pids, fn pid -> RealNode.initialize(pid,pid_to_nodeid_map[pid]) end)
+
+    #setting nodes up with random neighbours 
+    Enum.each(pids, fn pid -> RealNode.setNeighbour(pid,Enum.take_random(pids,3)))
+
+    #publish messages randomly to the nodes
+    Enum.each(pids, fn pid -> )
 
     # So Myapp will have a list of messages and it will initilize a set of nodes with these messages and then find messages from each node based on 
     # how many numRequests specified . 
@@ -35,7 +39,7 @@ defmodule MyApp do
     # each node is both an object store and a router that external application use to find objects
     # each object will have a root node and this node will store references to nodes that actually store the object
     # how root node is found :
-    # objects hash value first digit is comspred with nodes value first , if empty with v + 1 and so on unquote_splicingnode with largest refix mach function_exported?
+    # objects hash value first digit is compared with nodes value first , if empty with v + 1 and so on unquote_splicingnode with largest refix mach function_exported?
 
     # so we take an object , get its hash value and then find root node by comparing hash value and node ids
 
@@ -45,6 +49,10 @@ defmodule MyApp do
     # for object are routed to root node which references a node which stores the actual data
 
     ret_value
+  end
+
+  def hashStuff(x) do
+    :crypto.hash(:sha256, x) |> Base.encode16    
   end
 end
 
