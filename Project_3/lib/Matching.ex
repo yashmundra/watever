@@ -1,10 +1,19 @@
 defmodule Matching do
     
-  def max_prefix_match_length(str1,str2) do
+  def max_prefix_match_length(current_node,incoming_node) do
     #String.starts_with?(str,"prefix")
+
+    current_node_length = String.length(current_node)
+
+    #list of prefixes to try out
+    list_of_prefixes = Enum.each(1..current_node_length, fn i -> String.slice(incoming_node, 0, i) end)
+
+    match_status = Enum.each(list_of_prefixes, fn prefix -> String.starts_with?(current_node,prefix) end)
+
+    #remove true from front and count them and return that
+    Enum.take_while(match_status, fn x -> x end) |> Enum.count()
     
-    prefixies = Enum.map(1..String.length(str2), fn index -> end)
-    # if no match return 0 if just first letter match return 1 ....
+    
   end
 
   def get_pid_from_registry(n) do
