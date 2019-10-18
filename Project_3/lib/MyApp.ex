@@ -37,7 +37,13 @@ defmodule MyApp do
     #initializing nodes with their unique id's
     Enum.each(pids, fn pid -> RealNode.initialize(pid,pid_to_nodeid_map[pid]) end)
 
-    
+    #asking the nodes to connect to randomNodes for numRequests times
+
+    enum_of_enum_of_hops = Enum.each(1..numRequests, fn x-> callRandom(pids) end)
+
+
+    IO.puts "The hop values are "
+    IO.inspect enum_of_enum_of_hops
 
     
 
@@ -48,5 +54,11 @@ defmodule MyApp do
     #returns 64 digits of nonsense
     :crypto.hash(:sha256, x) |> Base.encode16    
   end
+
+  def callRandom(pids) do
+    Enum.each(pids, fn p-> RealNode.connectToRandomNode(p) end)  
+  end
+
+
 end
 

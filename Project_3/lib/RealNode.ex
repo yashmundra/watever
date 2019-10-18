@@ -16,6 +16,10 @@ defmodule RealNode do
       GenServer.cast(pid,{:initialize,node_id})
     end
 
+    def connectToRandomNode(pid) do
+      GenServer.call(pid,{:randomConnect})
+    end
+
     #SERVER API
 
     #routing table will be a keyword map with level values mapping to map of slot number to values with nil in slots where no entry and nodeid otherwise
@@ -62,11 +66,20 @@ defmodule RealNode do
       #cases slot is nil or not
       new_routing_table = case slot_to_update do
                               nil -> Map.replace!(routing_table,next_letter,n_id)
-        _                     -> Map.replace!(routing_table,next_letter,Matching.decider(slot_to_update,n_id,match_length,node_id))
+                              _   -> Map.replace!(routing_table,next_letter,Matching.decider(slot_to_update,n_id,match_length,node_id))
                           end
 
-
       {:noreply, {new_routing_table, n_id}}
+    end
+
+
+    ##################################   RANDOM CONNECT #####################################################
+
+
+    def handle_call({:randomConnect},_, {routing_table, node_id}) do
+      
+
+      {:reply,hops_taken,{routing_table, node_id}}
     end
 
 
