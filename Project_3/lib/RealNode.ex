@@ -78,7 +78,24 @@ defmodule RealNode do
 
     def handle_call({:randomConnect},_, {routing_table, node_id}) do
       
+      {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
 
+      random_node_id = Enum.filter(global_node_list, fn n-> n!=n_id end) |> Enum.random()
+
+      #get pid of that random node
+      pid = Matching.get_pid_from_registry(random_node_id)
+
+      #consult with your routing table to find the closest entry, send message to it to random forward 
+
+
+      {:reply,hops_taken,{routing_table, node_id}}
+    end
+
+    def handle_call({:randomForward,hops_until_now,destination_node},_, {routing_table, node_id}) do
+
+      hops_taken = hops_until_now + 1
+      #see if you are destination, else consult your routing table, find closest and random forward
+      
       {:reply,hops_taken,{routing_table, node_id}}
     end
 
