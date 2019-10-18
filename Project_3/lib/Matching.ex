@@ -21,4 +21,10 @@ defmodule Matching do
     p
   end
 
+  def decider(current_entry,incoming_entry,match_length,node_id) do
+    #start with match_length+1 index and see which is closer to node's index
+
+    
+  end
+
 end
