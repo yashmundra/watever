@@ -7,4 +7,9 @@ defmodule Matching do
     # if no match return 0 if just first letter match return 1 ....
   end
 
+  def get_pid_from_registry(n) do
+    {:ok,p} = Registry.meta(Registry.GlobalNodeList, {:tuple,n})
+    p
+  end
+
 end
