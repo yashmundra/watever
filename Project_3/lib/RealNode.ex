@@ -23,6 +23,7 @@ defmodule RealNode do
     #SERVER API
 
     #routing table will be a keyword map with level values mapping to map of slot number to values with nil in slots where no entry and nodeid otherwise
+
     
     ######################################     INITIALIZING       ################################################
     def handle_cast({:initialize,n_id},{routing_table, node_id}) do
@@ -86,20 +87,32 @@ defmodule RealNode do
       pid = Matching.get_pid_from_registry(random_node_id)
 
       #consult with your routing table to find the closest entry, send message to it to random forward 
+      closest_node_id = Matching.find_closest_entry_in_routing(node_id,random_node_id,routing_table)
 
+      closest_pid = Matching.get_pid_from_registry(closest_node_id)
 
-      {:reply,hops_taken,{routing_table, node_id}}
+      {:reply,hops,_} = GenServer.call(closest_pid,{:randomForward,0,random_node_id})
+
+      {:reply,hops,{routing_table, node_id}}
     end
+
 
     def handle_call({:randomForward,hops_until_now,destination_node},_, {routing_table, node_id}) do
 
       hops_taken = hops_until_now + 1
       #see if you are destination, else consult your routing table, find closest and random forward
+
+      if !String.equivalent?(destination_node,node_id) do
+        #consult with your routing table to find the closest entry, send message to it to random forward 
+        closest_node_id = Matching.find_closest_entry_in_routing(node_id,random_node_id,routing_table)
+        closest_pid = Matching.get_pid_from_registry(closest_node_id)
+        {:reply,hops_taken,_} = GenServer.call(closest_pid,{:randomForward,0,random_node_id})
+      end
       
       {:reply,hops_taken,{routing_table, node_id}}
     end
 
-
+    ##########################################################################################################
     
     
 end

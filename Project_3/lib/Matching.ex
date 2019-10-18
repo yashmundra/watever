@@ -43,4 +43,13 @@ defmodule Matching do
     
   end
 
+
+  def find_closest_entry_in_routing(current_node_id,destination_node_id,routing_table) do
+    #the upper prefixes are more important 
+    #so compare the dest with current and see what prefix match length
+    #if 2 for ex, go to 2 level and find entry for the third digit
+    #interesting case , if 0 match, go to first level and find the nearest first digit match and return that
+    
+  end
+
 end
