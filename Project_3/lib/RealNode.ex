@@ -12,95 +12,31 @@ defmodule RealNode do
 
     #CLIENT API
 
-    def publishObject(pid,msg) do
-      GenServer.cast(pid,{:publishObj,msg})
-    end
-
-    def unpublishObject(pid,msg) do
-      GenServer.cast(pid,{:unpublishObj,msg})
-    end
-    
-    def routeToObject(pid,obj_id) do
-      GenServer.cast(pid,{:routeToObj,obj_id})
-    end
-
-    def routeToNode(pid,node_id,exact) do
-      GenServer.cast(pid,{:routeToNode,node_id,exact}) 
-      end
-    end
-
     def initialize(pid,node_id) do
       GenServer.cast(pid,{:initialize,node_id})
     end
 
-    def setNeighbour(pid,list_of_neighbour_pids) do
-      GenServer.cast(pid,{:setNbor,list_of_neighbour_pids})
-    end
-
     #SERVER API
 
-    #routing table will be a keyword map with level values mapping to enums with nil in slots where no entry and {nodeid,pid} otherwise
-    #message to node map will store message as key and list of nodes that have that objects data
-    #root node for an object needs to be figured out beforehand in a determininstic fashion
-    #convert casts to calls so can wait for the root node to be discovered and a call cahin to be resolved
-
-    ##################################### PUBLISH ####################################################
-
-    def handle_cast({:publishObj,msg}, {message_to_nodes_map, routing_table, node_id}) do
-      root_pid = route_to_root(msg,routing_table,node_id) 
-      GenServer.cast(root_pid,{:storeObjRef,node_id,msg})
-      #store at the root node reference to local node and message
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
-    def handle_cast({:storeObjRef,node_id,msg},{message_to_nodes_map, routing_table, node_id}) do
-      #update node message map
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
-    #################################### UNPUBLISH  #####################################################
-
-    def handle_cast({:unpublishObj,msg},{message_to_nodes_map, routing_table, node_id}) do
-      #route to root
-      root_pid = route_to_root(msg,routing_table,node_id) 
-      GenServer.cast(root_pid,{:delObjRef,node_id,msg})
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
-    def handle_cast({:delObjRef,node_id,msg},{message_to_nodes_map, routing_table, node_id}) do
-      #update node message map
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
-    ###################################  ROUTE TO OBJ ########################################################
+    #routing table will be a keyword map with level values mapping to enums with nil in slots where no entry and nodeid otherwise
     
-    def handle_cast({:routeToObj,obj_id},{message_to_nodes_map, routing_table, node_id}) do
-
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
-    def handle_cast({:routeToNode,node_id,exact},{message_to_nodes_map, routing_table, node_id}) do
-      
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
-    def handle_cast({:initialize,n_id},{message_to_nodes_map, routing_table, node_id}) do
-
-      #64 routing levels and 16 slots . levels are zero indexed
+    def handle_cast({:initialize,n_id},{routing_table, node_id}) do
+      #levels are zero indexed
+      max_routing_level = String.length(n_id) - 1
       routing_row = Enum.map(1..16, fn x-> nil end)
-      my_routing_table = Enum.each(0..63, fn x-> {x,routing_row} end) |> Enum.into(%{})
+      my_routing_table = Enum.each(0..max_routing_level, fn x-> {x,routing_row} end) |> Enum.into(%{})
 
-      {:noreply, {%{}, my_routing_table, n_id}}
+      #send a acknowledged multicast here
+      {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
+
+      #drop your own nodeid from global_node_list
+      global_node_list = Enum.filter(global_node_list, fn n-> n!=n_id end)
+
+      #for each nodeid, we get its pid from registry and send it a message that a node with this id has entered
+      {:noreply, {my_routing_table, n_id}}
     end
     
-    def handle_cast({:setNbor,list_of_neighbour_pids},{message_to_nodes_map, routing_table, node_id}) do
-      #update routing table
-      #updates = Enum.each(list_of_neighbour_pids, fn pid -> {MyApp.hashStuff(pid),pid} end)
-      #Enum.each(updates, fn {n,p} -> M)
-      
-      {:noreply, {message_to_nodes_map, routing_table, node_id}}
-    end
-
+    
 end
   
     
