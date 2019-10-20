@@ -11,8 +11,11 @@ defmodule Matching do
     match_status = Enum.map(list_of_prefixes, fn prefix -> String.starts_with?(current_node,prefix) end)
 
     #remove true from front and count them and return that
-    Enum.take_while(match_status, fn x -> x end) |> Enum.count()
-    
+    len = Enum.take_while(match_status, fn x -> x end) |> Enum.count()
+
+    #IO.puts "returning match length #{len}"
+
+    len 
   end
 
   def get_pid_from_registry(n) do
@@ -21,6 +24,8 @@ defmodule Matching do
   end
 
   def decider(current_entry,incoming_entry,match_length,node_id) do
+
+    #IO.puts "deciding between #{current_entry} and #{incoming_entry}"
     #start with match_length+1 index and see which is closer to node's index
 
     #my_range = match_length+1..String.length(node_id)
@@ -55,26 +60,30 @@ defmodule Matching do
 
 
     #fetching the relevant cell of the routing table
-    #IO.puts "which ksks"
+    #IO.puts "here1"
     closest_entry = Map.get(Map.get(routing_table,prefix_length),digit_for_the_row)
-    #IO.puts "which ksksas"
+    #IO.puts "here2"
 
     #if no entry found, add 1 and try again and cycle through whole row. if whole row empty. cycle through the rows.
-    if closest_entry==nil do
-      #IO.puts "whsassch ksks"
-      non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,prefix_length)), fn x-> x!=nil end)
-      #IO.puts "whs ksks"
-      if Enum.count(non_nul_row_entry)>0 do
-        Enum.random(non_nul_row_entry)
-      else
-        #get all node ids in routing table
-        get_next_closest_entry(routing_table,prefix_length+1)
-      end
-    else #found closest
-    {closest_entry}
-    end
+    ret_value = if closest_entry==nil do
+                #IO.puts "here3"
+                non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,prefix_length)), fn x-> x!=nil end)
+                #IO.puts "here4"
+                  if Enum.count(non_nul_row_entry)>0 do
+                    #IO.puts "here5"
+                    Enum.random(non_nul_row_entry)
+                  else
+                    #get all node ids in routing table
+                    #IO.puts "here6"
+                    get_next_closest_entry(routing_table,prefix_length+1)
+                  end
+                else #found closest
+                  #IO.puts "here7"
+                  {closest_entry}
+                end
 
-    
+    IO.puts "closesnt entry is #{ret_value}"
+    ret_value
     
   end
 
@@ -84,8 +93,9 @@ defmodule Matching do
     row = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
     
     #to cycle through all the rows
-    next_row_number = rem(next_row_number,16)
-    #IO.puts "whsksks"
+    #this five represents 5 digits in the hash
+    next_row_number = rem(next_row_number,5)
+    #IO.puts "trying to get row #{next_row_number}"
     non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,next_row_number)), fn x-> x!=nil end)
     #IO.puts "whsks"
 
@@ -100,7 +110,8 @@ defmodule Matching do
 
   end
 
-  def update_routing_table(old_routing_table,row,letter,val) do
+  def update_routing_table(current_node,old_routing_table,row,letter,val) do
+    #IO.puts "updating node #{current_node} row #{row} letter #{letter} with value #{val} "
     current_row_map = Map.get(old_routing_table,row)
     new_row_map = Map.replace!(current_row_map,letter,val)
     Map.replace!(old_routing_table,row,new_row_map)

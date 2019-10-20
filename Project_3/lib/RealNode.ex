@@ -17,7 +17,7 @@ defmodule RealNode do
     end
 
     def connectToRandomNode(pid) do
-      GenServer.call(pid,{:randomConnect})
+      GenServer.call(pid,{:randomConnect},:infinity)
     end
 
     #SERVER API
@@ -37,7 +37,7 @@ defmodule RealNode do
       {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
 
       #drop your own nodeid from global_node_list
-      global_node_list = Enum.filter(global_node_list, fn n-> n!=n_id end)
+      global_node_list = Enum.filter(global_node_list, fn n-> n != n_id end)
 
       #for each nodeid, we get its pid from registry and send it a message that a node with this id has entered
       pids = Enum.map(global_node_list, fn n-> Matching.get_pid_from_registry(n) end)
@@ -55,29 +55,33 @@ defmodule RealNode do
       #find out how many prefix match for n_id and node_id, go to that number level , 
       #find next digit and put in that slot, if already there , see which one is closer to node_id
       #put that one there.
-      IO.puts "new routing table is"
+      #IO.puts "new routing table is"
+
       match_length = Matching.max_prefix_match_length(node_id,n_id)
       #IO.puts "wsks"
       route_row = Map.get(routing_table,match_length)
       #IO.puts "whsassch ksasasassks"
       #slot to update
+
+      #IO.puts "debugging n id is #{n_id} and match is #{match_length}"
       next_letter = String.at(n_id,match_length)
 
-
-      #IO.puts "whsassch kssaaaaasks"
+      IO.puts "route row is"
+      IO.inspect route_row
+      IO.puts "getting from row key #{next_letter}"
       slot_to_update = Map.get(route_row,next_letter)
-      IO.inspect slot_to_update
+      #IO.inspect slot_to_update
 
       #cases slot is nil or not
       new_routing_table = case slot_to_update do
-                              nil -> Matching.update_routing_table(routing_table,match_length,next_letter,n_id)
-                              _   -> Matching.update_routing_table(routing_table,match_length,next_letter,Matching.decider(slot_to_update,n_id,match_length,node_id))
+                              nil -> Matching.update_routing_table(node_id,routing_table,match_length,next_letter,n_id)
+                              _   -> Matching.update_routing_table(node_id,routing_table,match_length,next_letter,Matching.decider(slot_to_update,n_id,match_length,node_id))
                           end
 
       
       #IO.puts "yash new routing table is"
-      IO.puts "howdi"
-      IO.inspect new_routing_table
+      #IO.puts "howdi"
+      #IO.inspect new_routing_table
       {:noreply, {new_routing_table, n_id}}
     end
 
@@ -99,7 +103,7 @@ defmodule RealNode do
 
       closest_pid = Matching.get_pid_from_registry(closest_node_id)
 
-      {:reply,hops,_} = GenServer.call(closest_pid,{:randomForward,0,random_node_id})
+      {:reply,hops,_} = GenServer.call(closest_pid,{:randomForward,0,random_node_id},:infinity)
 
       {:reply,hops,{routing_table, node_id}}
     end
@@ -114,7 +118,7 @@ defmodule RealNode do
                               #consult with your routing table to find the closest entry, send message to it to random forward 
                               closest_node_id = Matching.find_closest_entry_in_routing(node_id,destination_node,routing_table)
                               closest_pid = Matching.get_pid_from_registry(closest_node_id)
-                              GenServer.call(closest_pid,{:randomForward,hops_taken,destination_node})
+                              GenServer.call(closest_pid,{:randomForward,hops_taken,destination_node},:infinity)
                               end
       
       {:reply,hops_taken,{routing_table, node_id}}

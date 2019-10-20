@@ -35,14 +35,14 @@ defmodule MyApp do
     #max hops is printed back
 
     #initializing nodes with their unique id's
-    Enum.each(pids, fn pid -> RealNode.initialize(pid,pid_to_nodeid_map[pid]) end)
+    Enum.each(pids, fn pid -> RealNode.initialize(pid,Map.get(pid_to_nodeid_map,pid)) end)
 
     #asking the nodes to connect to randomNodes for numRequests times
-    #enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
+    enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
 
 
     IO.puts "The hop values are "
-    #IO.inspect enum_of_enum_of_hops
+    IO.inspect enum_of_enum_of_hops
 
     
 
@@ -51,7 +51,7 @@ defmodule MyApp do
 
   def hashStuff(x) do
     #returns 64 digits of nonsense
-    :crypto.hash(:sha256, Float.to_string(x)) |> Base.encode16    
+    :crypto.hash(:sha256, Float.to_string(x)) |> Base.encode16 |> String.slice(0..4)
   end
 
   def callRandom(pids) do
