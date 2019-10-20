@@ -12,7 +12,7 @@ defmodule MyApp do
 
     pids = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
     
-    pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(pid)} end) |> Enum.into(%{})
+    pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(:rand.uniform())} end) |> Enum.into(%{})
 
     node_ids = Map.values(pid_to_nodeid_map)
 
@@ -39,7 +39,7 @@ defmodule MyApp do
 
     #asking the nodes to connect to randomNodes for numRequests times
 
-    enum_of_enum_of_hops = Enum.each(1..numRequests, fn x-> callRandom(pids) end)
+    enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
 
 
     IO.puts "The hop values are "
@@ -52,7 +52,7 @@ defmodule MyApp do
 
   def hashStuff(x) do
     #returns 64 digits of nonsense
-    :crypto.hash(:sha256, x) |> Base.encode16    
+    :crypto.hash(:sha256, Float.to_string(x)) |> Base.encode16    
   end
 
   def callRandom(pids) do

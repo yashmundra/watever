@@ -26,12 +26,12 @@ defmodule RealNode do
 
     
     ######################################     INITIALIZING       ################################################
-    def handle_cast({:initialize,n_id},{routing_table, node_id}) do
+    def handle_cast({:initialize,n_id},_) do
       #levels are zero indexed
       max_routing_level = String.length(n_id) - 1
       row = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
       routing_row = Enum.map(row, fn x-> {x,nil} end) |> Enum.into(%{})
-      my_routing_table = Enum.each(0..max_routing_level, fn x-> {x,routing_row} end) |> Enum.into(%{})
+      my_routing_table = Enum.map(0..max_routing_level, fn x-> {x,routing_row} end) |> Enum.into(%{})
 
       #send a acknowledged multicast here
       {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
@@ -40,7 +40,7 @@ defmodule RealNode do
       global_node_list = Enum.filter(global_node_list, fn n-> n!=n_id end)
 
       #for each nodeid, we get its pid from registry and send it a message that a node with this id has entered
-      pids = Enum.each(global_node_list, fn n-> Matching.get_pid_from_registry(n) end)
+      pids = Enum.map(global_node_list, fn n-> Matching.get_pid_from_registry(n) end)
       Enum.each(pids, fn p-> GenServer.cast(p,{:ackMulti,n_id}) end)
       {:noreply, {my_routing_table, n_id}}
     end
@@ -81,7 +81,7 @@ defmodule RealNode do
       
       {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
 
-      random_node_id = Enum.filter(global_node_list, fn n-> n!=n_id end) |> Enum.random()
+      random_node_id = Enum.filter(global_node_list, fn n-> n!=node_id end) |> Enum.random()
 
       #get pid of that random node
       pid = Matching.get_pid_from_registry(random_node_id)
@@ -102,12 +102,12 @@ defmodule RealNode do
       hops_taken = hops_until_now + 1
       #see if you are destination, else consult your routing table, find closest and random forward
 
-      if !String.equivalent?(destination_node,node_id) do
-        #consult with your routing table to find the closest entry, send message to it to random forward 
-        closest_node_id = Matching.find_closest_entry_in_routing(node_id,random_node_id,routing_table)
-        closest_pid = Matching.get_pid_from_registry(closest_node_id)
-        {:reply,hops_taken,_} = GenServer.call(closest_pid,{:randomForward,0,random_node_id})
-      end
+      {:reply,hops_taken,_} = if !String.equivalent?(destination_node,node_id) do
+                              #consult with your routing table to find the closest entry, send message to it to random forward 
+                              closest_node_id = Matching.find_closest_entry_in_routing(node_id,destination_node,routing_table)
+                              closest_pid = Matching.get_pid_from_registry(closest_node_id)
+                              GenServer.call(closest_pid,{:randomForward,hops_taken,destination_node})
+                              end
       
       {:reply,hops_taken,{routing_table, node_id}}
     end
