@@ -55,21 +55,29 @@ defmodule RealNode do
       #find out how many prefix match for n_id and node_id, go to that number level , 
       #find next digit and put in that slot, if already there , see which one is closer to node_id
       #put that one there.
+      IO.puts "new routing table is"
       match_length = Matching.max_prefix_match_length(node_id,n_id)
-
+      #IO.puts "wsks"
       route_row = Map.get(routing_table,match_length)
-
+      #IO.puts "whsassch ksasasassks"
       #slot to update
       next_letter = String.at(n_id,match_length)
 
+
+      #IO.puts "whsassch kssaaaaasks"
       slot_to_update = Map.get(route_row,next_letter)
+      IO.inspect slot_to_update
 
       #cases slot is nil or not
       new_routing_table = case slot_to_update do
-                              nil -> Map.replace!(routing_table,next_letter,n_id)
-                              _   -> Map.replace!(routing_table,next_letter,Matching.decider(slot_to_update,n_id,match_length,node_id))
+                              nil -> Matching.update_routing_table(routing_table,match_length,next_letter,n_id)
+                              _   -> Matching.update_routing_table(routing_table,match_length,next_letter,Matching.decider(slot_to_update,n_id,match_length,node_id))
                           end
 
+      
+      #IO.puts "yash new routing table is"
+      IO.puts "howdi"
+      IO.inspect new_routing_table
       {:noreply, {new_routing_table, n_id}}
     end
 

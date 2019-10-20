@@ -38,12 +38,11 @@ defmodule MyApp do
     Enum.each(pids, fn pid -> RealNode.initialize(pid,pid_to_nodeid_map[pid]) end)
 
     #asking the nodes to connect to randomNodes for numRequests times
-
-    enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
+    #enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
 
 
     IO.puts "The hop values are "
-    IO.inspect enum_of_enum_of_hops
+    #IO.inspect enum_of_enum_of_hops
 
     
 

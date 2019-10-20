@@ -55,11 +55,15 @@ defmodule Matching do
 
 
     #fetching the relevant cell of the routing table
+    #IO.puts "which ksks"
     closest_entry = Map.get(Map.get(routing_table,prefix_length),digit_for_the_row)
+    #IO.puts "which ksksas"
 
     #if no entry found, add 1 and try again and cycle through whole row. if whole row empty. cycle through the rows.
     if closest_entry==nil do
+      #IO.puts "whsassch ksks"
       non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,prefix_length)), fn x-> x!=nil end)
+      #IO.puts "whs ksks"
       if Enum.count(non_nul_row_entry)>0 do
         Enum.random(non_nul_row_entry)
       else
@@ -81,8 +85,9 @@ defmodule Matching do
     
     #to cycle through all the rows
     next_row_number = rem(next_row_number,16)
-
+    #IO.puts "whsksks"
     non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,next_row_number)), fn x-> x!=nil end)
+    #IO.puts "whsks"
 
     if Enum.count(non_nul_row_entry)>0 do
       Enum.random(non_nul_row_entry)
@@ -93,6 +98,12 @@ defmodule Matching do
     
 
 
+  end
+
+  def update_routing_table(old_routing_table,row,letter,val) do
+    current_row_map = Map.get(old_routing_table,row)
+    new_row_map = Map.replace!(current_row_map,letter,val)
+    Map.replace!(old_routing_table,row,new_row_map)
   end
 
 end
