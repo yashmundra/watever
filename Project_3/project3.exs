@@ -12,7 +12,7 @@ defmodule MyApp do
 
     pids = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
     
-    pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(pid)} end) |> Enum.into(%{})
+    pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(:rand.uniform())} end) |> Enum.into(%{})
 
     node_ids = Map.values(pid_to_nodeid_map)
 
@@ -35,10 +35,13 @@ defmodule MyApp do
     #max hops is printed back
 
     #initializing nodes with their unique id's
-    Enum.each(pids, fn pid -> RealNode.initialize(pid,pid_to_nodeid_map[pid]) end)
+    Enum.each(pids, fn pid -> RealNode.initialize(pid,Map.get(pid_to_nodeid_map,pid)) end)
+
+    Process.sleep(1000)
+
+    Enum.each(pids, fn pid -> RealNode.acknowledge(pid) end)
 
     #asking the nodes to connect to randomNodes for numRequests times
-
     enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
 
 
@@ -52,11 +55,11 @@ defmodule MyApp do
 
   def hashStuff(x) do
     #returns 64 digits of nonsense
-    :crypto.hash(:sha256, x) |> Base.encode16    
+    :crypto.hash(:sha256, Float.to_string(x)) |> Base.encode16 |> String.slice(0..4)
   end
 
   def callRandom(pids) do
-    Enum.each(pids, fn p-> RealNode.connectToRandomNode(p) end)  
+    Enum.map(pids, fn p-> RealNode.connectToRandomNode(p) end)  
   end
 
 
