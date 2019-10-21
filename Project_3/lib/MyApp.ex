@@ -47,7 +47,7 @@ defmodule MyApp do
     IO.puts "random conencting"
     Enum.map(1..numRequests, fn x-> callRandom(pids) end)
 
-    print_loading_message(10)
+    print_loading_message(20)
 
 
     IO.puts "The max hop value is #{inspect GenServer.call(counter_pid,{:answer})}"
