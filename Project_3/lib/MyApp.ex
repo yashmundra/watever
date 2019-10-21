@@ -14,7 +14,10 @@ defmodule MyApp do
     
     pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(:rand.uniform())} end) |> Enum.into(%{})
 
+    
     node_ids = Map.values(pid_to_nodeid_map)
+
+    IO.puts "node ids are #{inspect node_ids}"
 
     #starting counter 
     {:ok,counter_pid} = DynamicSupervisor.start_child(MyApp.DynamicSupervisor, HopCounter) 
@@ -27,17 +30,6 @@ defmodule MyApp do
     Registry.put_meta(Registry.GlobalNodeList, :global, node_ids)
     Registry.put_meta(Registry.GlobalNodeList,:hopCounter, counter_pid)
     Enum.map(pid_to_nodeid_map, fn {p,n} -> Registry.put_meta(Registry.GlobalNodeList, {:tuple,n}, p) end)
-    #{:ok, "custom_value"} = Registry.meta(Registry.GlobalNodeList, :custom_key)
-    #Registry.put_meta(Registry.PutMetaTest, {:tuple, :key}, "tuple_value")
-    #Registry.meta(Registry.PutMetaTest, {:tuple, :key})
-    #{:ok, "tuple_value"}
-
-    #add each node one by one into the network
-    #that node gets a nodeid and sends a acknowledged multicast by consulting the elixir registry for its neighbours
-
-    #each node is called bu the client program to connect to a random node and report the number of hops back
-
-    #max hops is printed back
 
     #initializing nodes with their unique id's
     Enum.each(pids, fn pid -> RealNode.initialize(pid,Map.get(pid_to_nodeid_map,pid)) end)
