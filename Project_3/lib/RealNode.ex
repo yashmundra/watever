@@ -32,7 +32,7 @@ defmodule RealNode do
     
     ######################################     INITIALIZING       ################################################
     def handle_cast({:initialize,n_id},_) do
-      IO.puts "initaliing with id #{n_id}"
+      #IO.puts "initaliing with id #{n_id}"
       #levels are zero indexed
       max_routing_level = String.length(n_id) - 1
       row = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
@@ -91,7 +91,7 @@ defmodule RealNode do
       #IO.puts "yash new routing table is"
       #IO.puts "howdi"
       #IO.inspect new_routing_table
-      {:noreply, {new_routing_table, n_id}}
+      {:noreply, {new_routing_table, node_id}}
     end
 
 
@@ -104,6 +104,7 @@ defmodule RealNode do
       {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
 
       random_node_id = Enum.filter(global_node_list, fn n-> n != node_id end) |> Enum.random()
+      #IO.puts "Random node is found is #{random_node_id}"
 
       IO.puts "in random connect of node #{node_id} with pid #{inspect Matching.get_pid_from_registry(node_id)} with ultimate dest #{random_node_id}"
       #get pid of that random node

@@ -41,7 +41,7 @@ defmodule MyApp do
     Enum.each(pids, fn pid -> RealNode.acknowledge(pid) end)
 
     IO.puts "multicasting"
-    print_loading_message(5)
+    #print_loading_message(5)
 
     #asking the nodes to connect to randomNodes for numRequests times
     IO.puts "random conencting"
