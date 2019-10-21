@@ -37,9 +37,13 @@ defmodule MyApp do
     #initializing nodes with their unique id's
     Enum.each(pids, fn pid -> RealNode.initialize(pid,Map.get(pid_to_nodeid_map,pid)) end)
 
-    Process.sleep(1000)
+    #Process.sleep(10000)
+
+    print_loading_message(10)
 
     Enum.each(pids, fn pid -> RealNode.acknowledge(pid) end)
+
+    print_loading_message(10)
 
     #asking the nodes to connect to randomNodes for numRequests times
     enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
@@ -47,8 +51,6 @@ defmodule MyApp do
 
     IO.puts "The hop values are "
     IO.inspect enum_of_enum_of_hops
-
-    
 
     ret_value
   end
@@ -60,6 +62,16 @@ defmodule MyApp do
 
   def callRandom(pids) do
     Enum.map(pids, fn p-> RealNode.connectToRandomNode(p) end)  
+  end
+
+  def print_loading_message(x) do
+    if x == 0 do
+      x
+    else
+      IO.puts x
+      Process.sleep(1000)
+      print_loading_message(x-1)
+    end
   end
 
 

@@ -17,7 +17,8 @@ defmodule RealNode do
     end
 
     def connectToRandomNode(pid) do
-      GenServer.call(pid,{:randomConnect},:infinity)
+      #IO.puts "calling random connect of process #{inspect pid}"
+      GenServer.cast(pid,{:randomConnect})
     end
 
     def acknowledge(pid) do
@@ -96,49 +97,56 @@ defmodule RealNode do
     ##################################          RANDOM CONNECT         #####################################################
 
 
-    def handle_call({:randomConnect},_, {routing_table, node_id}) do
+    def handle_cast({:randomConnect}, {routing_table, node_id}) do
       
-      IO.puts "howdi" 
+      #IO.puts "howdi" 
       {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
 
       random_node_id = Enum.filter(global_node_list, fn n-> n != node_id end) |> Enum.random()
 
-      IO.puts "in random connect of node #{node_id} trying ot get #{random_node_id}"
+      IO.puts "in random connect of node #{node_id} with pid #{inspect Matching.get_pid_from_registry(node_id)} with ultimate dest #{random_node_id}"
       #get pid of that random node
       pid = Matching.get_pid_from_registry(random_node_id)
       
       #consult with your routing table to find the closest entry, send message to it to random forward 
       closest_node_id = Matching.find_closest_entry_in_routing(node_id,random_node_id,routing_table)
 
-      IO.puts "closest node found is #{closest_node_id}"
-
       closest_pid = Matching.get_pid_from_registry(closest_node_id)
 
-      IO.puts "forwarding message from node #{node_id} to node #{closest_node_id}"
-      {:reply,hops,_} = GenServer.call(closest_pid,{:randomForward,0,random_node_id},:infinity)
+      #IO.puts "forwarding message from node #{node_id} to node #{closest_node_id} with closest pid #{inspect closest_pid}"
 
-      {:reply,hops,{routing_table, node_id}}
+      GenServer.cast(closest_pid,{:randomForward,0,random_node_id})
+
+      {:noreply,{routing_table, node_id}}
     end
 
 
-    def handle_call({:randomForward,hops_until_now,destination_node},_, {routing_table, node_id}) do
+    def handle_cast({:randomForward,hops_until_now,destination_node}, {routing_table, node_id}) do
 
       hops_taken = hops_until_now + 1
       #see if you are destination, else consult your routing table, find closest and random forward
-      IO.puts "dest and current are #{destination_node} and #{node_id}"
+      IO.puts "in node #{node_id} pid #{inspect Matching.get_pid_from_registry(node_id)}"#" recevide msg from #{inspect from}"
 
-      IO.puts "decision is #{!String.equivalent?(destination_node,node_id)}"
-      {:reply,hops_taken,_} = if !String.equivalent?(destination_node,node_id) do
-                              #consult with your routing table to find the closest entry, send message to it to random forward 
-                              closest_node_id = Matching.find_closest_entry_in_routing(node_id,destination_node,routing_table)
-                              closest_pid = Matching.get_pid_from_registry(closest_node_id)
-                              IO.puts "closest node found is #{closest_node_id}"
-                              IO.puts "hops #{hops_taken} from node #{node_id} to node #{closest_node_id} with ultimate dest #{destination_node}"
-                              GenServer.call(closest_pid,{:randomForward,hops_taken,destination_node},:infinity)
-                              end
+      #IO.puts "dest and current are #{destination_node} and #{node_id}"
+
+      #IO.puts "decision is #{!String.equivalent?(destination_node,node_id)}"
+      if !String.equivalent?(destination_node,node_id) do
+        #consult with your routing table to find the closest entry, send message to it to random forward 
+        closest_node_id = Matching.find_closest_entry_in_routing(node_id,destination_node,routing_table)
+        #if !String.equivalent?(destination_node,closest_node_id) do
+        closest_pid = Matching.get_pid_from_registry(closest_node_id)
+        IO.puts "in node #{node_id}: sending forward to #{closest_node_id} with pid #{inspect closest_pid} "
+        #IO.puts "hops #{hops_taken} from node #{node_id} to node #{closest_node_id} with ultimate dest #{destination_node}"
+        GenServer.cast(closest_pid,{:randomForward,hops_taken,destination_node})
+      else
+        #in dest node
+        IO.puts "Found destination"
+        {:ok,p} = Registry.meta(Registry.GlobalNodeList, :hopCounter)
+        GenServer.cast(p,{:nodeFound,hops_taken})
+      end
       
-      IO.puts "Found destination"
-      {:reply,hops_taken,{routing_table, node_id}}
+      
+      {:noreply, {routing_table, node_id}}
     end
 
     ##########################################################################################################

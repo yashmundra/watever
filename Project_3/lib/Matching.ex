@@ -60,25 +60,25 @@ defmodule Matching do
 
     #IO.inspect routing_table
     #fetching the relevant cell of the routing table
-    IO.puts "here1"
+    #IO.puts "here1"
     closest_entry = Map.get(Map.get(routing_table,prefix_length),digit_for_the_row)
-    IO.puts "here2"
+    #IO.puts "here2"
 
     #if no entry found, add 1 and try again and cycle through whole row. if whole row empty. cycle through the rows.
     ret_value = if closest_entry==nil do
-                IO.puts "here3"
+                #IO.puts "here3"
                 non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,prefix_length)), fn x-> x!=nil end)
-                IO.puts "here4"
+                #IO.puts "here4"
                   if Enum.count(non_nul_row_entry)>0 do
-                    IO.puts "here5"
+                    #IO.puts "here5"
                     Enum.random(non_nul_row_entry)
                   else
                     #get all node ids in routing table
-                    IO.puts "here6"
+                    #IO.puts "here6"
                     get_next_closest_entry(routing_table,prefix_length+1)
                   end
                 else #found closest
-                  IO.puts "here7"
+                  #IO.puts "here7"
                   closest_entry
                 end
 
@@ -95,7 +95,7 @@ defmodule Matching do
     #to cycle through all the rows
     #this five represents 5 digits in the hash
     next_row_number = rem(next_row_number,5)
-    IO.puts "trying to get row #{next_row_number}"
+    #IO.puts "trying to get row #{next_row_number}"
     non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,next_row_number)), fn x-> x!=nil end)
     #IO.puts "whsks"
 
