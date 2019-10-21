@@ -32,6 +32,7 @@ defmodule RealNode do
     
     ######################################     INITIALIZING       ################################################
     def handle_cast({:initialize,n_id},_) do
+      IO.puts "initaliing with id #{n_id}"
       #levels are zero indexed
       max_routing_level = String.length(n_id) - 1
       row = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
