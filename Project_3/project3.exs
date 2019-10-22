@@ -14,54 +14,55 @@ defmodule MyApp do
     
     pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(:rand.uniform())} end) |> Enum.into(%{})
 
+    
     node_ids = Map.values(pid_to_nodeid_map)
+
+    IO.puts "node ids are #{inspect node_ids}"
+
+    #starting counter 
+    {:ok,counter_pid} = DynamicSupervisor.start_child(MyApp.DynamicSupervisor, HopCounter) 
+    GenServer.cast(counter_pid,{:initialize})
 
     #initialize elixir registry 
     #registry will consist of :global key with all node ids enum as value
     #and nodeid keys with their pids as value
     Registry.start_link(keys: :unique, name: Registry.GlobalNodeList)
     Registry.put_meta(Registry.GlobalNodeList, :global, node_ids)
-    Enum.each(pid_to_nodeid_map, fn {p,n} -> Registry.put_meta(Registry.GlobalNodeList, {:tuple,n}, p) end)
-    #{:ok, "custom_value"} = Registry.meta(Registry.GlobalNodeList, :custom_key)
-    #Registry.put_meta(Registry.PutMetaTest, {:tuple, :key}, "tuple_value")
-    #Registry.meta(Registry.PutMetaTest, {:tuple, :key})
-    #{:ok, "tuple_value"}
-
-    #add each node one by one into the network
-    #that node gets a nodeid and sends a acknowledged multicast by consulting the elixir registry for its neighbours
-
-    #each node is called bu the client program to connect to a random node and report the number of hops back
-
-    #max hops is printed back
+    Registry.put_meta(Registry.GlobalNodeList,:hopCounter, counter_pid)
+    Enum.map(pid_to_nodeid_map, fn {p,n} -> Registry.put_meta(Registry.GlobalNodeList, {:tuple,n}, p) end)
 
     #initializing nodes with their unique id's
     Enum.each(pids, fn pid -> RealNode.initialize(pid,Map.get(pid_to_nodeid_map,pid)) end)
 
     #Process.sleep(10000)
-
-    print_loading_message(10)
+    IO.puts "initializing"
+    print_loading_message(5)
 
     Enum.each(pids, fn pid -> RealNode.acknowledge(pid) end)
 
-    print_loading_message(10)
+    IO.puts "multicasting"
+    #print_loading_message(5)
 
     #asking the nodes to connect to randomNodes for numRequests times
-    enum_of_enum_of_hops = Enum.map(1..numRequests, fn x-> callRandom(pids) end)
+    IO.puts "random conencting"
+    Enum.map(1..numRequests, fn x-> callRandom(pids) end)
+
+    print_loading_message(20)
 
 
-    IO.puts "The hop values are "
-    IO.inspect enum_of_enum_of_hops
+    IO.puts "The max hop value is #{inspect GenServer.call(counter_pid,{:answer})}"
 
     ret_value
   end
 
   def hashStuff(x) do
     #returns 64 digits of nonsense
-    :crypto.hash(:sha256, Float.to_string(x)) |> Base.encode16 |> String.slice(0..4)
+    :crypto.hash(:sha256, Float.to_string(x)) |> Base.encode16 |> String.slice(0..4) #chnage get_next_closest_entry too if you change this 
   end
 
   def callRandom(pids) do
-    Enum.map(pids, fn p-> RealNode.connectToRandomNode(p) end)  
+    IO.puts "pids are #{inspect pids}"
+    Enum.map(pids, fn p-> RealNode.connectToRandomNode(p) end)
   end
 
   def print_loading_message(x) do

@@ -100,7 +100,7 @@ defmodule RealNode do
 
     def handle_cast({:randomConnect}, {routing_table, node_id}) do
       
-      #IO.puts "howdi" 
+      IO.puts "howdi" 
       {:ok, global_node_list} = Registry.meta(Registry.GlobalNodeList, :global)
 
       random_node_id = Enum.filter(global_node_list, fn n-> n != node_id end) |> Enum.random()
@@ -115,7 +115,7 @@ defmodule RealNode do
 
       closest_pid = Matching.get_pid_from_registry(closest_node_id)
 
-      #IO.puts "forwarding message from node #{node_id} to node #{closest_node_id} with closest pid #{inspect closest_pid}"
+      IO.puts "forwarding message from node #{node_id} to node #{closest_node_id} with closest pid #{inspect closest_pid}"
 
       GenServer.cast(closest_pid,{:randomForward,0,random_node_id})
 
