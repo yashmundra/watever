@@ -10,14 +10,14 @@ defmodule MyApp do
 
     ret_value = Supervisor.start_link(children, strategy: :one_for_one)
 
-    pids = Enum.map(1..numNodes, fn x -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
+    pids = Enum.map(1..numNodes, fn _ -> DynamicSupervisor.start_child(MyApp.DynamicSupervisor, RealNode) end) |> Enum.map(fn {:ok,x} -> x end)
     
     pid_to_nodeid_map = Enum.map(pids, fn pid -> {pid,hashStuff(:rand.uniform())} end) |> Enum.into(%{})
 
     
     node_ids = Map.values(pid_to_nodeid_map)
 
-    IO.puts "node ids are #{inspect node_ids}"
+    #IO.puts "node ids are #{inspect node_ids}"
 
     #starting counter 
     {:ok,counter_pid} = DynamicSupervisor.start_child(MyApp.DynamicSupervisor, HopCounter) 
@@ -34,20 +34,19 @@ defmodule MyApp do
     #initializing nodes with their unique id's
     Enum.each(pids, fn pid -> RealNode.initialize(pid,Map.get(pid_to_nodeid_map,pid)) end)
 
-    #Process.sleep(10000)
-    IO.puts "initializing"
+    #IO.puts "initializing"
     print_loading_message(5)
 
     Enum.each(pids, fn pid -> RealNode.acknowledge(pid) end)
 
-    IO.puts "multicasting"
-    #print_loading_message(5)
+    #IO.puts "multicasting"
+    print_loading_message(5)
 
     #asking the nodes to connect to randomNodes for numRequests times
-    IO.puts "random conencting"
-    Enum.map(1..numRequests, fn x-> callRandom(pids) end)
+    #IO.puts "random conencting"
+    Enum.map(1..numRequests, fn _ -> callRandom(pids) end)
 
-    print_loading_message(20)
+    print_loading_message(10)
 
 
     IO.puts "The max hop value is #{inspect GenServer.call(counter_pid,{:answer})}"
@@ -61,7 +60,7 @@ defmodule MyApp do
   end
 
   def callRandom(pids) do
-    IO.puts "pids are #{inspect pids}"
+    #IO.puts "pids are #{inspect pids}"
     Enum.map(pids, fn p-> RealNode.connectToRandomNode(p) end)
   end
 
@@ -69,7 +68,7 @@ defmodule MyApp do
     if x == 0 do
       x
     else
-      IO.puts x
+      #IO.puts x
       Process.sleep(1000)
       print_loading_message(x-1)
     end

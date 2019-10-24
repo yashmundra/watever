@@ -23,18 +23,9 @@ defmodule Matching do
     p
   end
 
-  def decider(current_entry,incoming_entry,match_length,node_id) do
+  def decider(current_entry,incoming_entry,node_id) do
 
-    #IO.puts "deciding between #{current_entry} and #{incoming_entry}"
-    #start with match_length+1 index and see which is closer to node's index
-
-    #my_range = match_length+1..String.length(node_id)
-    #match_status = Enum.each(my_range, fn i-> String.equivalent?(String.at(current_entry,i),String.at(incoming_entry,i)) end)
-
-    #remove true from front and count them and return that
-    #more_match_offset = Enum.take_while(match_status, fn x -> x end) |> Enum.count()
-
-    #compare entry[macth_length+1+more_match_offset] and nodeid[macth_length+1+more_match_offset] and return the entry with lower distance
+    
     current_distance = String.jaro_distance(current_entry,node_id)
     incoming_distance = String.jaro_distance(incoming_entry,node_id)
 
@@ -67,7 +58,7 @@ defmodule Matching do
     #if no entry found, add 1 and try again and cycle through whole row. if whole row empty. cycle through the rows.
     ret_value = if closest_entry==nil do
                 #IO.puts "here3"
-                non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,prefix_length)), fn x-> x!=nil end)
+                non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,prefix_length)), fn x-> x != nil end)
                 #IO.puts "here4"
                   if Enum.count(non_nul_row_entry)>0 do
                     #IO.puts "here5"
@@ -88,17 +79,11 @@ defmodule Matching do
   end
 
   def get_next_closest_entry(routing_table,next_row_number) do
-    #get all non nils for the row if found then return else
-    #go to next row
-    row = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
     
-    #to cycle through all the rows
-    #this five represents 5 digits in the hash
     next_row_number = rem(next_row_number,5)
-    #IO.puts "trying to get row #{next_row_number}"
-    non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,next_row_number)), fn x-> x!=nil end)
-    #IO.puts "whsks"
-
+    
+    non_nul_row_entry = Enum.filter(Map.values(Map.get(routing_table,next_row_number)), fn x-> x != nil end)
+    
     if Enum.count(non_nul_row_entry)>0 do
       Enum.random(non_nul_row_entry)
     else
