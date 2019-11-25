@@ -1,38 +1,5 @@
 defmodule TwitterClone.Main do
-    def main(args) do
-      args |> parse_args |> delegate
-    end
-
-    defp parse_args(args) do
-      {_,parameters,_} = OptionParser.parse(args)
-      parameters
-    end
     
-    def delegate([]) do
-        Task.start fn -> TwitterClone.Server.start_link() end
-        receive do: (_ -> :ok)
-    end
-
-    def delegate(parameters) do
-        numClients = String.to_integer(Enum.at(parameters,0))
-        no_of_messages = String.to_integer(Enum.at(parameters,1))
-        disconnectClients = String.to_integer(Enum.at(parameters,2))
-        clientsToDisconnect = disconnectClients * (0.01) * numClients
-        :ets.new(:mainregistry, [:set, :public, :named_table])
-        
-        convergence_task = Task.async(fn -> converging(numClients,numClients,0,0,0,0,0) end)
-        :global.register_name(:mainproc,convergence_task.pid)
-        start_time = System.system_time(:millisecond)
-
-        createUsers(1,numClients,no_of_messages)
-
-        Task.await(convergence_task, :infinity)
-        IO.puts "Time taken for initial simulation to complete: #{System.system_time(:millisecond) - start_time} milliseconds"
-
-        simulate_disconnection(numClients,clientsToDisconnect)
-        receive do: (_ -> :ok)
-    end
-
     def converging(0,totalClients,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff) do
         IO.puts "Avg. time to tweet: #{tweets_time_diff/totalClients} milliseconds"
         IO.puts "Avg. time to query tweets subscribe to: #{queries_subscribedto_time_diff/totalClients} milliseconds"
