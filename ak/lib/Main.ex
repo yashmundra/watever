@@ -15,7 +15,7 @@ defmodule TwitterClone.Main do
 
     def delegate(parameters) do
         numClients = String.to_integer(Enum.at(parameters,0))
-        maxSubcribers = String.to_integer(Enum.at(parameters,1))
+        no_of_messages = String.to_integer(Enum.at(parameters,1))
         disconnectClients = String.to_integer(Enum.at(parameters,2))
         clientsToDisconnect = disconnectClients * (0.01) * numClients
         :ets.new(:mainregistry, [:set, :public, :named_table])
@@ -24,7 +24,7 @@ defmodule TwitterClone.Main do
         :global.register_name(:mainproc,convergence_task.pid)
         start_time = System.system_time(:millisecond)
 
-        createUsers(1,numClients,maxSubcribers)
+        createUsers(1,numClients,no_of_messages)
 
         Task.await(convergence_task, :infinity)
         IO.puts "Time taken for initial simulation to complete: #{System.system_time(:millisecond) - start_time} milliseconds"
@@ -48,13 +48,13 @@ defmodule TwitterClone.Main do
       end
     end
 
-    def createUsers(count,noOfClients,totalSubscribers) do
+    def createUsers(count,noOfClients,no_of_messages) do
         userName = Integer.to_string(count)
-        noOfTweets = round(Float.floor(totalSubscribers/count))
-        noToSubscribe = round(Float.floor(totalSubscribers/(noOfClients-count+1))) - 1
+        noOfTweets = no_of_messages
+        noToSubscribe = 2
         pid = spawn(fn -> TwitterClone.Client.start_link(userName,noOfTweets,noToSubscribe,false) end)
         :ets.insert(:mainregistry, {userName, pid})
-        if (count != noOfClients) do createUsers(count+1,noOfClients,totalSubscribers) end
+        if (count != noOfClients) do createUsers(count+1,noOfClients,no_of_messages) end
     end
 
     def whereis(userId) do

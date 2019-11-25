@@ -69,3 +69,13 @@ OUTPUT
 1. On the simulator's console we print query results for all the 3 types of queries, prefixed with the corresponding user's ID.
 2. The simulator's console also prints live tweets for every user. User ID is prefixed to this output as well to identify which user's live view is getting updated.
 3. If <disconnectClients> parameter is 0, the clients simulator console displays the performance statistics at the end. Otherwise, it prints the statistics and continues to simulate periods of live connection and disconnection.
+
+
+
+
+Updated Running instructions:
+mix escript.build
+epmd -daemon
+escript project4
+escript project4 10 5 20
+
