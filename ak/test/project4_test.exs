@@ -19,7 +19,23 @@ defmodule AssertionTest do
     end
   end
 
-  test "tweeting and retrieving tweets" do
+  test "tweeting tweets" do
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
+
+    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+
+    send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",1})
+
+    :timer.sleep(500)
+
+    [{_,[tweet]}] = :ets.lookup(:tweets, 1)
+
+    assert tweet=="how di do #fr"
+    
+  end
+
+  test "retreiving tweets" do
     Task.async fn -> TwitterClone.Server.start_link() end
     :timer.sleep(3000)
 
@@ -30,8 +46,9 @@ defmodule AssertionTest do
     send(:global.whereis_name(:TwitterServer),{:getMyTweets,1})    
 
     receive do
-      {:repGetMyTweets,[list]} -> assert list=="how di do #fr"
-    end
+       {:repGetMyTweets,[list]} -> assert list=="how di do #fr"
+     end
+
     
   end
 
@@ -88,13 +105,17 @@ defmodule AssertionTest do
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do @1",2})
 
-    :timer.sleep(3000)
-    send(:global.whereis_name(:TwitterServer),{:tweetsWithMention,1})
+    :timer.sleep(1000)
 
-    IO.puts "mention query"
-    receive do
-      {:repTweetsWithMention,list} -> IO.inspect list
+    userId="1"
+    [tup] = if :ets.lookup(:hashtags_mentions, "@" <> userId) != [] do
+      :ets.lookup(:hashtags_mentions, "@" <> userId)
+    else
+      [{"#",[]}]
     end
+    [tweet] = elem(tup, 1)
+
+    assert tweet=="how di do @1"
 
     
     

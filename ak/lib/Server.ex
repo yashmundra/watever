@@ -23,8 +23,6 @@ defmodule TwitterClone.Server do
                 if current_ip === "127.0.0.1" do
                     if l > 1 do
                         make_distributed(tail,l-1)
-                    else 
-                        IO.puts "Could not make current node distributed."
                     end
                 else
                     server_node_name = String.to_atom("server@" <> current_ip)
@@ -32,7 +30,7 @@ defmodule TwitterClone.Server do
                     Node.set_cookie(server_node_name,:monster)
                 end
             rescue
-                _ -> if l > 1, do: make_distributed(tail,l-1), else: IO.puts "Could not make current node distributed."
+                _ -> if l > 1, do: make_distributed(tail,l-1)
             end
         end
     end
