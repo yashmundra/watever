@@ -20,7 +20,7 @@ defmodule AssertionTest do
   end
 
   test "tweeting and retrieving tweets" do
-    pid = Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> TwitterClone.Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
@@ -30,59 +30,127 @@ defmodule AssertionTest do
     send(:global.whereis_name(:TwitterServer),{:getMyTweets,1})    
 
     receive do
-      {:repGetMyTweets,list} -> IO.inspect "all my tweets are #{list}"
+      {:repGetMyTweets,[list]} -> assert list=="how di do #fr"
     end
     
   end
 
+  test "get subscribed tweets" do
 
-  # # test "my mentions" do
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
 
-  # #   Task.async fn -> TwitterClone.Server.start_link() end
-  # #   :timer.sleep(3000)
+    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
 
-  # #   send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
-  # #   send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
-  # #   send(:global.whereis_name(:TwitterServer),{:tweet,"user 1 tweeting that #COP5615isgreat @2",1})
-    
-  # #   send(:global.whereis_name(:TwitterServer),{:tweetsWithMention,2})
-  # #   receive do
-  # #       {:repTweetsWithMention,list} -> IO.inspect list, label: "User 2 :- Tweets With @2"
-  # #   end
+    send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
 
-  # # end
+    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
 
-  # test "subscribe to people" do
-  #   Task.async fn -> TwitterClone.Server.start_link() end
-  #   :timer.sleep(3000)
+    #subscribing 1 to 2 so 1 is a follower of 2
+    send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,2})
 
-  #   send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
-  #   send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    send(:global.whereis_name(:TwitterServer),{:tweetsSubscribedTo,1})
 
-  #   send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,"2"})
+    receive do
+      {:repTweetsSubscribedTo,[tweet]} -> assert tweet=="how di do #fr"
+    end
 
 
     
-  # end
+  end
 
-  # test "tweets subscribed" do
+  test "get hashtag query" do
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
 
-  #   Task.async fn -> TwitterClone.Server.start_link() end
-  #   :timer.sleep(3000)
+    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+
+    send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
+
+    send(:global.whereis_name(:TwitterServer),{:tweetsWithHashtag,"#fr",2})
+
+    receive do
+      {:repTweetsWithHashtag,[tweet]} -> assert tweet=="how di do #fr"
+    end
+
+  end
+
+  test "mention query" do
+
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
+
+    send(:global.whereis_name(:TwitterServer),{:registerUser,2,:c.pid(0,250,0)})
+
+    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+
+    :timer.sleep(1000)
+
+    send(:global.whereis_name(:TwitterServer),{:tweet,"how di do @1",2})
+
+    :timer.sleep(3000)
+    send(:global.whereis_name(:TwitterServer),{:tweetsWithMention,1})
+
+    IO.puts "mention query"
+    receive do
+      {:repTweetsWithMention,list} -> IO.inspect list
+    end
+
     
-  #   send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
-  #   send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    
+  end
 
-  #   send(:global.whereis_name(:TwitterServer),{:tweet,"user 1 tweeting that #COP5615isgreat",2})
+  test "login user" do
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
+    
+    send(:global.whereis_name(:TwitterServer),{:loginUser,1,self()})
 
-  #   send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,"2"})
+    :timer.sleep(500)
+    [{1,pid}] = :ets.lookup(:clientsregistry,1)
+
+    assert pid==self()
 
 
-  #   send(:global.whereis_name(:TwitterServer),{:tweetsSubscribedTo,1})
-  #   receive do
-  #       {:repTweetsSubscribedTo,list} ->  IO.inspect list, label: "User1 :- Tweets Subscribed To"
-  #   end
+  end
 
-  # end
+  test "logout user" do
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
+
+    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    
+    send(:global.whereis_name(:TwitterServer),{:disconnectUser,2})
+
+    assert :ets.lookup(:clientsregistry,2)==[]
+
+
+  end
+
+
+  test "add subscriber" do
+    Task.async fn -> TwitterClone.Server.start_link() end
+    :timer.sleep(3000)
+
+    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+
+    send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
+
+    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+
+    #subscribing 1 to 2 so 1 is a follower of 2
+    send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,2})
+
+    :timer.sleep(1000)
+    
+    [tup] = :ets.lookup(:subscribedto, 1) 
+    [sub_to] = elem(tup,1)  
+
+    assert sub_to==2
+
+  end
+
+
+
   
 end

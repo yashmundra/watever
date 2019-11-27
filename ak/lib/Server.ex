@@ -47,7 +47,6 @@ defmodule TwitterClone.Server do
         :ets.new(:followers, [:set, :public, :named_table])
         server_id = spawn_link(fn() -> api_handler() end) 
         :global.register_name(:TwitterServer,server_id)
-        IO.puts "Server Started"
         receive do: (_ -> :ok) 
     end
 
