@@ -1,4 +1,4 @@
-defmodule TwitterClone.Main do
+defmodule Twitter_Misc do
     
     def converging(0,totalClients,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff) do
         IO.puts "Avg. time to tweet: #{tweets_time_diff/totalClients} milliseconds"
@@ -19,7 +19,7 @@ defmodule TwitterClone.Main do
         userName = Integer.to_string(count)
         noOfTweets = no_of_messages
         noToSubscribe = 2
-        pid = spawn(fn -> TwitterClone.Client.start_link(userName,noOfTweets,noToSubscribe,false) end)
+        pid = spawn(fn -> Twitter_Client.start_link(userName,noOfTweets,noToSubscribe,false) end)
         :ets.insert(:mainregistry, {userName, pid})
         if (count != noOfClients) do createUsers(count+1,noOfClients,no_of_messages) end
     end
@@ -34,7 +34,7 @@ defmodule TwitterClone.Main do
         disconnectList = handle_disconnection(numClients,clientsToDisconnect,0,[])
         Process.sleep(1000)
         Enum.each disconnectList, fn userName -> 
-            pid = spawn(fn -> TwitterClone.Client.start_link(userName,-1,-1,true) end)
+            pid = spawn(fn -> Twitter_Client.start_link(userName,-1,-1,true) end)
             :ets.insert(:mainregistry, {userName, pid})
         end
         simulate_disconnection(numClients,clientsToDisconnect)

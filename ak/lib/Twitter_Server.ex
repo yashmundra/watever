@@ -1,4 +1,4 @@
-defmodule TwitterClone.Server do
+defmodule Twitter_Server do
     use GenServer
     require Logger
 

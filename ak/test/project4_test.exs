@@ -10,7 +10,7 @@ defmodule AssertionTest do
   end
 
   test "Registering User" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
@@ -20,7 +20,7 @@ defmodule AssertionTest do
   end
 
   test "tweeting tweets" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
@@ -36,7 +36,7 @@ defmodule AssertionTest do
   end
 
   test "retreiving tweets" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
@@ -54,7 +54,7 @@ defmodule AssertionTest do
 
   test "get subscribed tweets" do
 
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
@@ -77,7 +77,7 @@ defmodule AssertionTest do
   end
 
   test "get hashtag query" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
@@ -94,7 +94,7 @@ defmodule AssertionTest do
 
   test "mention query" do
 
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,2,:c.pid(0,250,0)})
@@ -122,7 +122,7 @@ defmodule AssertionTest do
   end
 
   test "login user" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
     
     send(:global.whereis_name(:TwitterServer),{:loginUser,1,self()})
@@ -136,7 +136,7 @@ defmodule AssertionTest do
   end
 
   test "logout user" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
@@ -150,7 +150,7 @@ defmodule AssertionTest do
 
 
   test "add subscriber" do
-    Task.async fn -> TwitterClone.Server.start_link() end
+    Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
     send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
