@@ -13,7 +13,7 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
     receive do
         {:registerConfirmation} -> assert true
     end
@@ -23,7 +23,7 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",1})
 
@@ -39,7 +39,7 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",1})
 
@@ -57,11 +57,11 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,2,self()})
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     #subscribing 1 to 2 so 1 is a follower of 2
     send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,2})
@@ -80,7 +80,7 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,2,self()})
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
 
@@ -97,9 +97,9 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,2,:c.pid(0,250,0)})
+    send(:global.whereis_name(:TwitterServer),{:user_register,2,:c.pid(0,250,0)})
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     :timer.sleep(1000)
 
@@ -139,7 +139,7 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,2,self()})
     
     send(:global.whereis_name(:TwitterServer),{:disconnectUser,2})
 
@@ -153,11 +153,11 @@ defmodule AssertionTest do
     Task.async fn -> Twitter_Server.start_link() end
     :timer.sleep(3000)
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,2,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,2,self()})
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
 
-    send(:global.whereis_name(:TwitterServer),{:registerUser,1,self()})
+    send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     #subscribing 1 to 2 so 1 is a follower of 2
     send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,2})

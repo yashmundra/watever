@@ -1,11 +1,6 @@
 defmodule Twitter_Misc do
     
     def converging(0,totalClients,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff) do
-        IO.puts "Avg. time to tweet: #{tweets_time_diff/totalClients} milliseconds"
-        IO.puts "Avg. time to query tweets subscribe to: #{queries_subscribedto_time_diff/totalClients} milliseconds"
-        IO.puts "Avg. time to query tweets by hashtag: #{queries_hashtag_time_diff/totalClients} milliseconds"
-        IO.puts "Avg. time to query tweets by mention: #{queries_mention_time_diff/totalClients} milliseconds"
-        IO.puts "Avg. time to query all relevant tweets: #{queries_myTweets_time_diff/totalClients} milliseconds"
     end
 
     def converging(numClients,totalClients,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff) do
@@ -50,7 +45,6 @@ defmodule Twitter_Misc do
                 send(:global.whereis_name(:TwitterServer),{:disconnectUser,userId})
                 :ets.insert(:mainregistry, {userId, nil})
                 Process.exit(disconnectClientId,:kill)
-                IO.puts "Simulator :- User #{userId} has been disconnected"
                 handle_disconnection(numClients,clientsToDisconnect,clientsDisconnected+1,disconnectList)
             else
                 handle_disconnection(numClients,clientsToDisconnect,clientsDisconnected,disconnectList)
@@ -60,7 +54,7 @@ defmodule Twitter_Misc do
         end
     end
 
-    def randomizer(l) do
+    def random_string_generate(l) do
       :crypto.strong_rand_bytes(l) |> Base.url_encode64 |> binary_part(0, l) |> String.downcase
     end
 end

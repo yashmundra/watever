@@ -1,6 +1,5 @@
 defmodule Twitter_Server do
     use GenServer
-    require Logger
 
     def start_link() do
         GenServer.start_link(__MODULE__, :ok)
@@ -50,7 +49,7 @@ defmodule Twitter_Server do
 
     def api_handler() do
         receive do
-            {:registerUser,userId,pid} -> register_user(userId,pid)
+            {:user_register,userId,pid} -> register_user(userId,pid)
                                           send(pid,{:registerConfirmation})
             {:tweet,tweetString,userId} -> process_tweet(tweetString,userId)
             {:tweetsSubscribedTo,userId} -> Task.start fn -> tweets_subscribed_to(userId) end

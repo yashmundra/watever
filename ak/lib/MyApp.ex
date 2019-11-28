@@ -3,7 +3,7 @@ defmodule MyApp do
   
     def start(_type, _args) do
         
-        Task.async fn -> Twitter_Server.start_link() end
+        pid = Task.async fn -> Twitter_Server.start_link() end
         :timer.sleep(3000)
         numClients = elem(Integer.parse(Enum.at(System.argv,0)),0)
         no_of_messages = elem(Integer.parse(Enum.at(System.argv,1)),0)
@@ -22,6 +22,7 @@ defmodule MyApp do
   
         Twitter_Misc.simulate_disconnection(numClients,clientsToDisconnect)
         receive do: (_ -> :ok)
+        pid
     end 
 end
   
