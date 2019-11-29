@@ -5,30 +5,31 @@ defmodule Twitter_Client do
         GenServer.start_link(__MODULE__, [userId,tweetCount,msgs,flag_bool])
     end
 
-    def make_distributed([head | tail],l) do
+    def run_dist(x,l) do
+        [head|tail] = x
         unless Node.alive?() do
             try do
                 {ip_tuple,_,_} = head
-                current_ip = to_string(:inet_parse.ntoa(ip_tuple))
-                if current_ip === "127.0.0.1" do
+                my_ip = to_string(:inet_parse.ntoa(ip_tuple))
+                if my_ip === "127.0.0.1" do
                     if l > 1 do
-                        make_distributed(tail,l-1)
+                        run_dist(tail,l-1)
                     end
                 else
-                    server_node_name = String.to_atom("client@" <> current_ip)
-                    Node.start(server_node_name)
-                    Node.set_cookie(server_node_name,:monster)
-                    Node.connect(String.to_atom("server@" <> current_ip))
+                    srv_name = String.to_atom("client@" <> my_ip)
+                    Node.start(srv_name)
+                    Node.set_cookie(srv_name,:monster)
+                    Node.connect(String.to_atom("server@" <> my_ip))
                 end
             rescue
-                _ -> if l > 1, do: make_distributed(tail,l-1)
+                _ -> if l > 1, do: run_dist(tail,l-1)
             end
         end
     end
 
-    def init([userId,noOfTweets,noToSubscribe,existingUser]) do
+    def init([userId,tweetCount,msgs,existingUser]) do
         {:ok,iflist}=:inet.getif()
-        make_distributed(Enum.reverse(iflist),length(iflist))
+        run_dist(Enum.reverse(iflist),length(iflist))
         :global.sync()
 
         if existingUser do
@@ -37,7 +38,7 @@ defmodule Twitter_Client do
         
         #Register Account
         send(:global.whereis_name(:TwitterServer),{:user_register,userId,self()})
-        server_interact(userId,noOfTweets,noToSubscribe)
+        server_interact(userId,tweetCount,msgs)
         receive do: (_ -> :ok)
     end
 
@@ -49,11 +50,11 @@ defmodule Twitter_Client do
         querying_for_tweets(userId)
     end
 
-    def server_interact(userId,noOfTweets,noToSubscribe) do
+    def server_interact(userId,tweetCount,msgs) do
 
         #Subscribe
-        if noToSubscribe > 0 do
-            subList = generate_subList(1,noToSubscribe,[])
+        if msgs > 0 do
+            subList = generate_subList(1,msgs,[])
             send_sub_req(userId,subList)
         end
 
@@ -66,7 +67,7 @@ defmodule Twitter_Client do
         send(:global.whereis_name(:TwitterServer),{:tweet,"#{userId} making use of hashtags #whatever",userId})
 
         #Send Tweets
-        for _ <- 1..noOfTweets do
+        for _ <- 1..tweetCount do
             send(:global.whereis_name(:TwitterServer),{:tweet,"#{userId} says #{random_string_generate(5)} could be cuter",userId})
         end
 
@@ -92,8 +93,8 @@ defmodule Twitter_Client do
         fetch_tweets_send_rq(userId)
         queries_myTweets_time_diff = System.system_time(:millisecond) - start_time
 
-        tweets_time_diff = tweets_time_diff/(noOfTweets+3)
-        send(:global.whereis_name(:mainproc),{:perfmetrics,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff})
+        tweets_time_diff = tweets_time_diff/(tweetCount+3)
+        send(:global.whereis_name(:proc_stat),{:perfmetrics,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff})
 
         #Live View
         querying_for_tweets(userId)
@@ -110,9 +111,9 @@ defmodule Twitter_Client do
     
 
     def sending_retweeting(userId) do
-        send(:global.whereis_name(:TwitterServer),{:tweetsSubscribedTo,userId})
+        send(:global.whereis_name(:TwitterServer),{:find_follow_tweet,userId})
         list = receive do
-            {:repTweetsSubscribedTo,list} -> list
+            {:sub_res,list} -> list
         end
         if list != [] do
             rt = hd(list)
@@ -121,15 +122,15 @@ defmodule Twitter_Client do
     end
 
     def fetch_tweets_send_rq(userId) do
-        send(:global.whereis_name(:TwitterServer),{:getMyTweets,userId})
+        send(:global.whereis_name(:TwitterServer),{:getFeeds,userId})
         receive do
-            {:repGetMyTweets,list} -> IO.puts "#{userId} says all #{list}"
+            {:tweet_res,list} -> IO.puts "#{userId} says all #{list}"
         end
     end
 
     def send_sub_req(userId,subscribeToList) do
         Enum.each subscribeToList, fn accountId -> 
-            send(:global.whereis_name(:TwitterServer),{:addSubscriber,userId,Integer.to_string(accountId)})
+            send(:global.whereis_name(:TwitterServer),{:sub_add_follow,userId,Integer.to_string(accountId)})
         end
     end
 
@@ -141,9 +142,9 @@ defmodule Twitter_Client do
     end
 
     def querying_for_specific_hashtag(tag,userId) do
-        send(:global.whereis_name(:TwitterServer),{:tweetsWithHashtag,tag,userId})
+        send(:global.whereis_name(:TwitterServer),{:qry_hashtg_tweet,tag,userId})
         receive do
-            {:repTweetsWithHashtag,list} -> IO.puts "#{userId} says #{list}"
+            {:tag_res,list} -> IO.puts "#{userId} says #{list}"
         end
     end
 
@@ -152,18 +153,18 @@ defmodule Twitter_Client do
       end
 
     def querying_tweets_from_subscription(userId) do
-        send(:global.whereis_name(:TwitterServer),{:tweetsSubscribedTo,userId})
+        send(:global.whereis_name(:TwitterServer),{:find_follow_tweet,userId})
         receive do
-            {:repTweetsSubscribedTo,list} ->  if list != [], do: IO.puts "#{userId} subscribes to following #{list}"
+            {:sub_res,list} ->  if list != [], do: IO.puts "#{userId} subscribes to following #{list}"
         end
     end
 
     
 
     def querying_mentioning_tweet(userId) do
-         send(:global.whereis_name(:TwitterServer),{:tweetsWithMention,userId})
+         send(:global.whereis_name(:TwitterServer),{:qry_mention,userId})
         receive do
-            {:repTweetsWithMention,list} -> IO.puts "#{userId} says mention #{list}"
+            {:mention_res,list} -> IO.puts "#{userId} says mention #{list}"
         end
     end
 

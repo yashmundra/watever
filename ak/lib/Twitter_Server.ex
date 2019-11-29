@@ -14,29 +14,29 @@ defmodule Twitter_Server do
         end
     end
 
-    def make_distributed([head | tail],l) do
+    def run_dist([head | tail],l) do
         unless Node.alive?() do
             try do
                 {ip_tuple,_,_} = head
-                current_ip = to_string(:inet_parse.ntoa(ip_tuple))
-                if current_ip === "127.0.0.1" do
+                my_ip = to_string(:inet_parse.ntoa(ip_tuple))
+                if my_ip === "127.0.0.1" do
                     if l > 1 do
-                        make_distributed(tail,l-1)
+                        run_dist(tail,l-1)
                     end
                 else
-                    server_node_name = String.to_atom("server@" <> current_ip)
-                    Node.start(server_node_name)
-                    Node.set_cookie(server_node_name,:monster)
+                    srv_name = String.to_atom("server@" <> my_ip)
+                    Node.start(srv_name)
+                    Node.set_cookie(srv_name,:monster)
                 end
             rescue
-                _ -> if l > 1, do: make_distributed(tail,l-1)
+                _ -> if l > 1, do: run_dist(tail,l-1)
             end
         end
     end
 
     def init(:ok) do
         {:ok,iflist}=:inet.getif()
-        make_distributed(Enum.reverse(iflist),length(iflist))
+        run_dist(Enum.reverse(iflist),length(iflist))
         :ets.new(:clientsregistry, [:set, :public, :named_table])
         :ets.new(:tweets, [:set, :public, :named_table])
         :ets.new(:hashtags_mentions, [:set, :public, :named_table])
@@ -52,11 +52,11 @@ defmodule Twitter_Server do
             {:user_register,userId,pid} -> register_user(userId,pid)
                                           send(pid,{:registerConfirmation})
             {:tweet,tweetString,userId} -> process_tweet(tweetString,userId)
-            {:tweetsSubscribedTo,userId} -> Task.start fn -> tweets_subscribed_to(userId) end
-            {:tweetsWithHashtag,hashTag,userId} -> Task.start fn -> tweets_with_hashtag(hashTag,userId) end
-            {:tweetsWithMention,userId} -> Task.start fn -> tweets_with_mention(userId) end
-            {:getMyTweets,userId} -> Task.start fn -> get_my_tweets(userId) end
-            {:addSubscriber,userId,subId} -> add_subscribed_to(userId,subId)
+            {:find_follow_tweet,userId} -> Task.start fn -> tweets_subscribed_to(userId) end
+            {:qry_hashtg_tweet,hashTag,userId} -> Task.start fn -> tweets_with_hashtag(hashTag,userId) end
+            {:qry_mention,userId} -> Task.start fn -> tweets_with_mention(userId) end
+            {:getFeeds,userId} -> Task.start fn -> get_my_tweets(userId) end
+            {:sub_add_follow,userId,subId} -> add_subscribed_to(userId,subId)
                                              add_followers(subId,userId)
             {:disconnectUser,userId} -> disconnect_user(userId)
             {:loginUser,userId,pid} -> :ets.insert(:clientsregistry, {userId, pid})
@@ -87,7 +87,7 @@ defmodule Twitter_Server do
     def get_my_tweets(userId) do
         [tup] = :ets.lookup(:tweets, userId)
         list = elem(tup, 1)
-        send(whereis(userId),{:repGetMyTweets,list})
+        send(whereis(userId),{:tweet_res,list})
     end
 
     def get_subscribed_to(userId) do
@@ -156,7 +156,7 @@ defmodule Twitter_Server do
     def tweets_subscribed_to(userId) do 
         subscribedTo = get_subscribed_to(userId)
         list = generate_tweet_list(subscribedTo,[])
-        send(whereis(userId),{:repTweetsSubscribedTo,list})
+        send(whereis(userId),{:sub_res,list})
     end
 
     def generate_tweet_list([head | tail],tweetlist) do
@@ -173,7 +173,7 @@ defmodule Twitter_Server do
             [{"#",[]}]
         end
         list = elem(tup, 1)
-        send(whereis(userId),{:repTweetsWithHashtag,list})
+        send(whereis(userId),{:tag_res,list})
     end
 
     def tweets_with_mention(userId) do
@@ -183,6 +183,6 @@ defmodule Twitter_Server do
             [{"#",[]}]
         end
         list = elem(tup, 1)
-        send(whereis(userId),{:repTweetsWithMention,list})
+        send(whereis(userId),{:mention_res,list})
     end
 end

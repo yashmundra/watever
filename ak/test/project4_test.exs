@@ -43,10 +43,10 @@ defmodule AssertionTest do
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",1})
 
-    send(:global.whereis_name(:TwitterServer),{:getMyTweets,1})    
+    send(:global.whereis_name(:TwitterServer),{:getFeeds,1})    
 
     receive do
-       {:repGetMyTweets,[list]} -> assert list=="how di do #fr"
+       {:tweet_res,[list]} -> assert list=="how di do #fr"
      end
 
     
@@ -64,12 +64,12 @@ defmodule AssertionTest do
     send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     #subscribing 1 to 2 so 1 is a follower of 2
-    send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,2})
+    send(:global.whereis_name(:TwitterServer),{:sub_add_follow,1,2})
 
-    send(:global.whereis_name(:TwitterServer),{:tweetsSubscribedTo,1})
+    send(:global.whereis_name(:TwitterServer),{:find_follow_tweet,1})
 
     receive do
-      {:repTweetsSubscribedTo,[tweet]} -> assert tweet=="how di do #fr"
+      {:sub_res,[tweet]} -> assert tweet=="how di do #fr"
     end
 
 
@@ -84,10 +84,10 @@ defmodule AssertionTest do
 
     send(:global.whereis_name(:TwitterServer),{:tweet,"how di do #fr",2})
 
-    send(:global.whereis_name(:TwitterServer),{:tweetsWithHashtag,"#fr",2})
+    send(:global.whereis_name(:TwitterServer),{:qry_hashtg_tweet,"#fr",2})
 
     receive do
-      {:repTweetsWithHashtag,[tweet]} -> assert tweet=="how di do #fr"
+      {:tag_res,[tweet]} -> assert tweet=="how di do #fr"
     end
 
   end
@@ -160,7 +160,7 @@ defmodule AssertionTest do
     send(:global.whereis_name(:TwitterServer),{:user_register,1,self()})
 
     #subscribing 1 to 2 so 1 is a follower of 2
-    send(:global.whereis_name(:TwitterServer),{:addSubscriber,1,2})
+    send(:global.whereis_name(:TwitterServer),{:sub_add_follow,1,2})
 
     :timer.sleep(1000)
     

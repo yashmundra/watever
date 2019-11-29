@@ -49,15 +49,15 @@ Two terminals are required to execute Twitter server and clients simulator separ
 
 CLIENTS SIMULATOR PROGRAM INPUTS
 --------------------------------
- - numClients: 		the number of clients to simulate
- - maxSubscribers: 	the maximum number of subscribers a Twitter account can have in the simulation (must be < numClients)
+ - no_of_clients: 		the number of clients to simulate
+ - maxSubscribers: 	the maximum number of subscribers a Twitter account can have in the simulation (must be < no_of_clients)
  - disconnectClients: 	the percentage of clients to disconnect to simulate periods of live connection and disconnection
 
 RUNNING project4.tgz
 --------------------
 1. Go to the folder 'project4' in both terminals using command line. 
 2. Start the Twitter engine in one by executing this command: escript project4 
-3. Start the clients simulator in the other terminal using the following command: escript project4 <numClients> <maxSubscribers> <disconnectClients>
+3. Start the clients simulator in the other terminal using the following command: escript project4 <no_of_clients> <maxSubscribers> <disconnectClients>
    e.g. escript project4 10 5 20   
 4. Note that both programs do not terminate by themselves. 
    a. Twitter engine is designed to always stay on-line to handle incoming client connections.
