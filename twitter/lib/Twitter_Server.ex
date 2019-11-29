@@ -6,12 +6,76 @@ defmodule Twitter_Server do
     end
 
     def whereis(userId) do
-        if :ets.lookup(:clientsregistry, userId) == [] do
+        if :ets.lookup(:id_pid_map, userId) == [] do
             nil
         else
-            [tup] = :ets.lookup(:clientsregistry, userId)
+            [tup] = :ets.lookup(:id_pid_map, userId)
             elem(tup, 1)
         end
+    end
+
+    def init(:ok) do
+        {:ok,iflist}=:inet.getif()
+        run_dist(Enum.reverse(iflist),length(iflist))
+        :ets.new(:id_pid_map, [:set, :public, :named_table])
+        :ets.new(:tag_twt_map, [:set, :public, :named_table])
+        :ets.new(:tweets, [:set, :public, :named_table])
+        :ets.new(:id_to_subid_map, [:set, :public, :named_table])
+        :ets.new(:id_to_follow_map, [:set, :public, :named_table])
+        server_id = spawn_link(fn() -> call_mapper() end) 
+        :global.register_name(:TwitterServer,server_id)
+        receive do: (_ -> :ok) 
+    end
+
+    def register_user(userId,pid) do
+        :ets.insert(:id_pid_map, {userId, pid})
+        :ets.insert(:tweets, {userId, []})
+        :ets.insert(:id_to_subid_map, {userId, []})
+        if :ets.lookup(:id_to_follow_map, userId) == [], do: :ets.insert(:id_to_follow_map, {userId, []})
+    end
+
+    def disconnect_user(userId) do
+        :ets.insert(:id_pid_map, {userId, nil})
+    end
+
+    def get_tweets(userId) do
+        if :ets.lookup(:tweets, userId) == [] do
+            []
+        else
+            [tup] = :ets.lookup(:tweets, userId)
+            elem(tup, 1)
+        end
+    end
+
+    def get_my_tweets(userId) do
+        [tup] = :ets.lookup(:tweets, userId)
+        list = elem(tup, 1)
+        send(whereis(userId),{:tweet_res,list})
+    end
+
+    def get_subscribed_to(userId) do
+        [tup] = :ets.lookup(:id_to_subid_map, userId)
+        elem(tup, 1)
+    end
+
+    def get_followers(userId) do
+        [tup] = :ets.lookup(:id_to_follow_map, userId)
+        elem(tup, 1)
+    end
+
+    def add_subscribed_to(userId,sub) do
+        [tup] = :ets.lookup(:id_to_subid_map, userId)
+        list = elem(tup, 1)
+        list = [sub | list]
+        :ets.insert(:id_to_subid_map, {userId, list})
+    end
+
+    def add_followers(userId,foll) do
+        if :ets.lookup(:id_to_follow_map, userId) == [], do: :ets.insert(:id_to_follow_map, {userId, []})
+        [tup] = :ets.lookup(:id_to_follow_map, userId)
+        list = elem(tup, 1)
+        list = [foll | list]
+        :ets.insert(:id_to_follow_map, {userId, list})
     end
 
     def run_dist([head | tail],l) do
@@ -33,87 +97,7 @@ defmodule Twitter_Server do
             end
         end
     end
-
-    def init(:ok) do
-        {:ok,iflist}=:inet.getif()
-        run_dist(Enum.reverse(iflist),length(iflist))
-        :ets.new(:clientsregistry, [:set, :public, :named_table])
-        :ets.new(:tweets, [:set, :public, :named_table])
-        :ets.new(:hashtags_mentions, [:set, :public, :named_table])
-        :ets.new(:subscribedto, [:set, :public, :named_table])
-        :ets.new(:followers, [:set, :public, :named_table])
-        server_id = spawn_link(fn() -> api_handler() end) 
-        :global.register_name(:TwitterServer,server_id)
-        receive do: (_ -> :ok) 
-    end
-
-    def api_handler() do
-        receive do
-            {:user_register,userId,pid} -> register_user(userId,pid)
-                                          send(pid,{:registerConfirmation})
-            {:tweet,tweetString,userId} -> process_tweet(tweetString,userId)
-            {:find_follow_tweet,userId} -> Task.start fn -> tweets_subscribed_to(userId) end
-            {:qry_hashtg_tweet,hashTag,userId} -> Task.start fn -> tweets_with_hashtag(hashTag,userId) end
-            {:qry_mention,userId} -> Task.start fn -> tweets_with_mention(userId) end
-            {:getFeeds,userId} -> Task.start fn -> get_my_tweets(userId) end
-            {:sub_add_follow,userId,subId} -> add_subscribed_to(userId,subId)
-                                             add_followers(subId,userId)
-            {:disconnectUser,userId} -> disconnect_user(userId)
-            {:loginUser,userId,pid} -> :ets.insert(:clientsregistry, {userId, pid})
-        end
-        api_handler()
-    end
-
-    def register_user(userId,pid) do
-        :ets.insert(:clientsregistry, {userId, pid})
-        :ets.insert(:tweets, {userId, []})
-        :ets.insert(:subscribedto, {userId, []})
-        if :ets.lookup(:followers, userId) == [], do: :ets.insert(:followers, {userId, []})
-    end
-
-    def disconnect_user(userId) do
-        :ets.insert(:clientsregistry, {userId, nil})
-    end
-
-    def get_tweets(userId) do
-        if :ets.lookup(:tweets, userId) == [] do
-            []
-        else
-            [tup] = :ets.lookup(:tweets, userId)
-            elem(tup, 1)
-        end
-    end
-
-    def get_my_tweets(userId) do
-        [tup] = :ets.lookup(:tweets, userId)
-        list = elem(tup, 1)
-        send(whereis(userId),{:tweet_res,list})
-    end
-
-    def get_subscribed_to(userId) do
-        [tup] = :ets.lookup(:subscribedto, userId)
-        elem(tup, 1)
-    end
-
-    def get_followers(userId) do
-        [tup] = :ets.lookup(:followers, userId)
-        elem(tup, 1)
-    end
-
-    def add_subscribed_to(userId,sub) do
-        [tup] = :ets.lookup(:subscribedto, userId)
-        list = elem(tup, 1)
-        list = [sub | list]
-        :ets.insert(:subscribedto, {userId, list})
-    end
-
-    def add_followers(userId,foll) do
-        if :ets.lookup(:followers, userId) == [], do: :ets.insert(:followers, {userId, []})
-        [tup] = :ets.lookup(:followers, userId)
-        list = elem(tup, 1)
-        list = [foll | list]
-        :ets.insert(:followers, {userId, list})
-    end
+    
    
     def process_tweet(tweetString,userId) do
         [tup] = :ets.lookup(:tweets, userId)
@@ -132,25 +116,42 @@ defmodule Twitter_Server do
             if whereis(userName) != nil, do: send(whereis(userName),{:live,tweetString})
         end
 
-        [{_,followersList}] = :ets.lookup(:followers, userId)
+        [{_,followersList}] = :ets.lookup(:id_to_follow_map, userId)
         Enum.each followersList, fn follower -> 
 	        if whereis(follower) != nil, do: send(whereis(follower),{:live,tweetString})
         end
     end
 
     def insert_tags(tag,tweetString) do
-        [tup] = if :ets.lookup(:hashtags_mentions, tag) != [] do
-            :ets.lookup(:hashtags_mentions, tag)
+        [tup] = if :ets.lookup(:tag_twt_map, tag) != [] do
+            :ets.lookup(:tag_twt_map, tag)
         else
             [nil]
         end
         if tup == nil do 
-            :ets.insert(:hashtags_mentions,{tag,[tweetString]})
+            :ets.insert(:tag_twt_map,{tag,[tweetString]})
         else
             list = elem(tup,1)
             list = [tweetString | list]
-            :ets.insert(:hashtags_mentions,{tag,list})
+            :ets.insert(:tag_twt_map,{tag,list})
         end
+    end
+
+    def call_mapper() do
+        receive do
+            {:user_register,userId,pid} -> register_user(userId,pid)
+                                          send(pid,{:registerConfirmation})
+            {:tweet,tweetString,userId} -> process_tweet(tweetString,userId)
+            {:find_follow_tweet,userId} -> Task.start fn -> tweets_subscribed_to(userId) end
+            {:qry_hashtg_tweet,hashTag,userId} -> Task.start fn -> tweets_with_hashtag(hashTag,userId) end
+            {:qry_mention,userId} -> Task.start fn -> tweets_with_mention(userId) end
+            {:getFeeds,userId} -> Task.start fn -> get_my_tweets(userId) end
+            {:sub_add_follow,userId,subId} -> add_subscribed_to(userId,subId)
+                                             add_followers(subId,userId)
+            {:disconnectUser,userId} -> disconnect_user(userId)
+            {:loginUser,userId,pid} -> :ets.insert(:id_pid_map, {userId, pid})
+        end
+        call_mapper()
     end
 
     def tweets_subscribed_to(userId) do 
@@ -167,8 +168,8 @@ defmodule Twitter_Server do
     def generate_tweet_list([],tweetlist), do: tweetlist
 
     def tweets_with_hashtag(hashTag, userId) do 
-        [tup] = if :ets.lookup(:hashtags_mentions, hashTag) != [] do
-            :ets.lookup(:hashtags_mentions, hashTag)
+        [tup] = if :ets.lookup(:tag_twt_map, hashTag) != [] do
+            :ets.lookup(:tag_twt_map, hashTag)
         else
             [{"#",[]}]
         end
@@ -177,8 +178,8 @@ defmodule Twitter_Server do
     end
 
     def tweets_with_mention(userId) do
-        [tup] = if :ets.lookup(:hashtags_mentions, "@" <> userId) != [] do
-            :ets.lookup(:hashtags_mentions, "@" <> userId)
+        [tup] = if :ets.lookup(:tag_twt_map, "@" <> userId) != [] do
+            :ets.lookup(:tag_twt_map, "@" <> userId)
         else
             [{"#",[]}]
         end

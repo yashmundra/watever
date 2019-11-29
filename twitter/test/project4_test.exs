@@ -108,8 +108,8 @@ defmodule AssertionTest do
     :timer.sleep(1000)
 
     userId="1"
-    [tup] = if :ets.lookup(:hashtags_mentions, "@" <> userId) != [] do
-      :ets.lookup(:hashtags_mentions, "@" <> userId)
+    [tup] = if :ets.lookup(:tag_twt_map, "@" <> userId) != [] do
+      :ets.lookup(:tag_twt_map, "@" <> userId)
     else
       [{"#",[]}]
     end
@@ -128,7 +128,7 @@ defmodule AssertionTest do
     send(:global.whereis_name(:TwitterServer),{:loginUser,1,self()})
 
     :timer.sleep(500)
-    [{1,pid}] = :ets.lookup(:clientsregistry,1)
+    [{1,pid}] = :ets.lookup(:id_pid_map,1)
 
     assert pid==self()
 
@@ -143,7 +143,7 @@ defmodule AssertionTest do
     
     send(:global.whereis_name(:TwitterServer),{:disconnectUser,2})
 
-    assert :ets.lookup(:clientsregistry,2)==[]
+    assert :ets.lookup(:id_pid_map,2)==[]
 
 
   end
@@ -164,7 +164,7 @@ defmodule AssertionTest do
 
     :timer.sleep(1000)
     
-    [tup] = :ets.lookup(:subscribedto, 1) 
+    [tup] = :ets.lookup(:id_to_subid_map, 1) 
     [sub_to] = elem(tup,1)  
 
     assert sub_to==2

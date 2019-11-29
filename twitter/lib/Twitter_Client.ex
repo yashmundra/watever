@@ -5,27 +5,7 @@ defmodule Twitter_Client do
         GenServer.start_link(__MODULE__, [userId,tweetCount,msgs,flag_bool])
     end
 
-    def run_dist(x,l) do
-        [head|tail] = x
-        unless Node.alive?() do
-            try do
-                {ip_tuple,_,_} = head
-                my_ip = to_string(:inet_parse.ntoa(ip_tuple))
-                if my_ip === "127.0.0.1" do
-                    if l > 1 do
-                        run_dist(tail,l-1)
-                    end
-                else
-                    srv_name = String.to_atom("client@" <> my_ip)
-                    Node.start(srv_name)
-                    Node.set_cookie(srv_name,:monster)
-                    Node.connect(String.to_atom("server@" <> my_ip))
-                end
-            rescue
-                _ -> if l > 1, do: run_dist(tail,l-1)
-            end
-        end
-    end
+
 
     def init([userId,tweetCount,msgs,existingUser]) do
         {:ok,iflist}=:inet.getif()
@@ -73,31 +53,53 @@ defmodule Twitter_Client do
 
         #ReTweet
         sending_retweeting(userId)
-        tweets_time_diff = System.system_time(:millisecond) - start_time
+        metric_1 = System.system_time(:millisecond) - start_time
 
         #Queries
         start_time = System.system_time(:millisecond)
         querying_tweets_from_subscription(userId)
-        queries_subscribedto_time_diff = System.system_time(:millisecond) - start_time
+        metric_2 = System.system_time(:millisecond) - start_time
         
         start_time = System.system_time(:millisecond)
         querying_for_specific_hashtag("#whatever",userId)
-        queries_hashtag_time_diff = System.system_time(:millisecond) - start_time
+        metric_3 = System.system_time(:millisecond) - start_time
 
         start_time = System.system_time(:millisecond)
         querying_mentioning_tweet(userId)
-        queries_mention_time_diff = System.system_time(:millisecond) - start_time
+        metric_4 = System.system_time(:millisecond) - start_time
 
         start_time = System.system_time(:millisecond)
         #Get All Tweets
         fetch_tweets_send_rq(userId)
-        queries_myTweets_time_diff = System.system_time(:millisecond) - start_time
+        metric_5 = System.system_time(:millisecond) - start_time
 
-        tweets_time_diff = tweets_time_diff/(tweetCount+3)
-        send(:global.whereis_name(:proc_stat),{:perfmetrics,tweets_time_diff,queries_subscribedto_time_diff,queries_hashtag_time_diff,queries_mention_time_diff,queries_myTweets_time_diff})
+        metric_1 = metric_1/(tweetCount+3)
+        send(:global.whereis_name(:proc_stat),{:simul_met,metric_1,metric_2,metric_3,metric_4,metric_5})
 
         #Live View
         querying_for_tweets(userId)
+    end
+
+    def run_dist(x,l) do
+        [head|tail] = x
+        unless Node.alive?() do
+            try do
+                {ip_tuple,_,_} = head
+                my_ip = to_string(:inet_parse.ntoa(ip_tuple))
+                if my_ip === "127.0.0.1" do
+                    if l > 1 do
+                        run_dist(tail,l-1)
+                    end
+                else
+                    srv_name = String.to_atom("client@" <> my_ip)
+                    Node.start(srv_name)
+                    Node.set_cookie(srv_name,:monster)
+                    Node.connect(String.to_atom("server@" <> my_ip))
+                end
+            rescue
+                _ -> if l > 1, do: run_dist(tail,l-1)
+            end
+        end
     end
 
     def generate_subList(count,noOfSubs,list) do
