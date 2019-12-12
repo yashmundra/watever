@@ -1,0 +1,47 @@
+<h1>Searh the tweets you want</h1>
+
+<%= form_for @conn, tweet_path(@conn, :searchfromsubscriber), [as: :searchsubscriber], fn f -> %>
+  
+  <div class="form-group">
+  	<%= label f, :fromsubscriber, class: "control-label" %>
+      <%= text_input f, :subscriber, class: "form-control" %>
+      <%= error_tag f, :subscriber %>
+  </div>
+  
+  <div class="form-group">
+    <%= submit "Search", class: "btn btn-primary" %>
+  </div>
+
+<% end %>
+
+<%= form_for @conn, tweet_path(@conn, :searchfrommentioned), [as: :searchmentioned], fn f -> %>
+  
+  <div class="form-group">
+  	<%= label f, :frommentioned, class: "control-label" %>
+      <%= text_input f, :mentioned, class: "form-control" %>
+      <%= error_tag f, :mentioned %>
+  </div>
+  
+  <div class="form-group">
+    <%= submit "Search", class: "btn btn-primary" %>
+  </div>
+
+<% end %>
+
+<%= form_for @conn, tweet_path(@conn, :searchfromhashtag), [as: :searchhashtag], fn f -> %>
+  
+  <div class="form-group">
+  	<%= label f, :fromhashtag, class: "control-label" %>
+      <%= text_input f, :hashtag, class: "form-control" %>
+      <%= error_tag f, :hashtag %>
+  </div>
+  
+  <div class="form-group">
+    <%= submit "Search", class: "btn btn-primary" %>
+  </div>
+
+<% end %>
+
+
+
+<%= link "Back to Home", to: page_path(@conn, :home)%>

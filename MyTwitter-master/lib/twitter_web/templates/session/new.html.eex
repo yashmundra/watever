@@ -1,0 +1,11 @@
+<%= form_for @conn, session_path(@conn, :create), [as: :session], fn f -> %>
+  	<%= label f, :username%>
+      <%= text_input f, :username%>
+      <%= error_tag f, :username %>
+      <%= label f, :password%>
+      <%= password_input f, :password%>
+      <%= error_tag f, :password %>
+    <%= submit "Sign In"%>
+<% end %>
+<%= link "Sign Up", to: user_path(@conn, :new)%>
+

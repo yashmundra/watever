@@ -1,0 +1,30 @@
+<div class="jumbotron">
+  <h2><%= gettext "Welcome to %{name}", name: "Phoenix!" %></h2>
+  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
+</div>
+
+<!--
+1. register - done
+2. tweet: [TWEET] - done
+3. subscribe: [SUBSCRIBE_TO_ID] - done
+4. get: [# | @] - done
+5. retweet: [TWEET_ID]
+-->
+<div id="messages"></div>
+<br /> <br /> 
+1. Register: first, click register once <br /> 
+2. Tweet: write something in textbox and click the button <br /> 
+3. Subscribe to: write a valid ID in the textbox and click the button. Subscribes current user to the feed of inputted user<br /> 
+4. Get Hashtag: write a word starting with a '#' and click the button. Prints all tweets with that hashtag<br /> 
+5. Get Mention: write a word starting with a '@' and click the button. Prints all tweets with that mention<br /> 
+6. Retweet: write a valid tweet id in the textbox and click the button. Retweets the tweet with that tweet id<br /> <br /> 
+
+<input type="button" id="register" value="Register" /> <br /> <br />
+<input type="button" id="tweet" value="Tweet" /> &nbsp;&nbsp;
+<input type="button" id="subscribe" value="Subscribe to" /> &nbsp;&nbsp;
+<input type="button" id="hashtag" value="Get Hashtag(start with #)" /> &nbsp;&nbsp;
+<input type="button" id="mention" value="Get Mention(start with @)" /> &nbsp;&nbsp;
+<input type="button" id="retweet" value="Retweet" /> <br /> <br /> 
+
+<input id="chat-input" type="text"></input>
+

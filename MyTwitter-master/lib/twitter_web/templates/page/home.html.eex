@@ -1,0 +1,37 @@
+<div>
+  <h1>User Home Page</h1>
+  <ul>
+    <li>
+      User_name:
+      <%= @user.username %>
+    </li>
+    <li>
+      Subscribe:
+      <%= @user.subscribe %>
+    </li>
+    <li>
+      Follower:
+      <%= @user.follower %>
+    </li>
+
+</ul>
+</div>
+
+
+<%= link "Tweet", to: tweet_path(@conn, :sendtweetindex)%>
+<br>
+<%= link "Search for tweets", to: tweet_path(@conn, :querytweetindex) %>
+<br>
+<%= link "Follow another twitter user", to: user_path(@conn, :subscribeindex) %>
+<br>
+<%= link "Sign Out", to: session_path(@conn, :delete, :access), method: :delete%>
+<br><br><br>
+
+<%= for tweet <- @tweetslive do %>
+         <strong>TWEET "</strong>
+         <%=tweet.content %>"
+         <strong>By</strong>
+         <%= tweet.author %>
+       <%= link "Retweet-this-tweet", to: retweet_path(@conn, :show, tweet) %>     
+       <br><br>
+<% end %>

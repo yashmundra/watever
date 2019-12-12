@@ -1,0 +1,26 @@
+<h2>Query Result</h2>
+
+<%= if @tweetsfound===[] do %>
+    <div class="alert alert-danger">
+      <p>Oops, no tweet is qualified for your search</p>
+    </div>
+<% end %>
+
+<%= for tweet <- @tweetsfound do %>
+   <ul>
+     <li>
+       <strong>Author:</strong>
+       <%= tweet.author %>
+     </li>
+     <li>
+       <strong>Time:</strong>
+       <%= tweet.inserted_at %>
+     </li>
+     <li>
+       <strong>Content:</strong>
+       <%= tweet.content %>
+     </li>
+   </ul>
+<% end %>
+
+<%= link "Back to Query", to: tweet_path(@conn, :querytweetindex)%>

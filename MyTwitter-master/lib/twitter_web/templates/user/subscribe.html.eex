@@ -1,0 +1,8 @@
+<h1>Type username to follow</h1>
+<%= form_for @conn, user_path(@conn, :subscribe), [as: :follow], fn f -> %>
+  	<%= label f, :subscribe%>
+    <%= text_input f, :subscribe%>
+    <%= error_tag f, :subscribe %>
+    <%= submit "Submit me"%>
+<% end %>
+<%= link "Back to main page", to: page_path(@conn, :home)%>

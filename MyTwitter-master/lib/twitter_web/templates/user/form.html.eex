@@ -1,0 +1,10 @@
+<%= form_for @changeset, @action, fn f-> %>
+    <%= label f, :username%>
+    <%= text_input f, :username%>
+    <%= error_tag f, :username %>
+    <%= label f, :password%>
+    <%= password_input f, :password%>
+    <%= error_tag f, :password %>
+    <%= submit "Submit"%>
+<% end %>
+
