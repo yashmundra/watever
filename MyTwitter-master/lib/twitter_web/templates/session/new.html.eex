@@ -5,6 +5,7 @@
       <%= label f, :password%>
       <%= password_input f, :password%>
       <%= error_tag f, :password %>
+      <br>
     <%= submit "Sign In"%>
 <% end %>
 <%= link "Sign Up", to: user_path(@conn, :new)%>

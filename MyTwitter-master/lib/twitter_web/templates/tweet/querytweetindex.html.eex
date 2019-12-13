@@ -1,47 +1,25 @@
-<h1>Searh the tweets you want</h1>
+<h1>Query for tweets</h1>
 
 <%= form_for @conn, tweet_path(@conn, :searchfromsubscriber), [as: :searchsubscriber], fn f -> %>
-  
-  <div class="form-group">
-  	<%= label f, :fromsubscriber, class: "control-label" %>
-      <%= text_input f, :subscriber, class: "form-control" %>
+  	<%= label f, :from_subscriber%>
+      <%= text_input f, :subscriber%>
       <%= error_tag f, :subscriber %>
-  </div>
-  
-  <div class="form-group">
-    <%= submit "Search", class: "btn btn-primary" %>
-  </div>
-
+    <%= submit "Search"%>
 <% end %>
 
 <%= form_for @conn, tweet_path(@conn, :searchfrommentioned), [as: :searchmentioned], fn f -> %>
-  
-  <div class="form-group">
-  	<%= label f, :frommentioned, class: "control-label" %>
-      <%= text_input f, :mentioned, class: "form-control" %>
+  	<%= label f, :from_mentioned %>
+      <%= text_input f, :mentioned%>
       <%= error_tag f, :mentioned %>
-  </div>
-  
-  <div class="form-group">
-    <%= submit "Search", class: "btn btn-primary" %>
-  </div>
-
+    <%= submit "Search"%>
 <% end %>
-
 <%= form_for @conn, tweet_path(@conn, :searchfromhashtag), [as: :searchhashtag], fn f -> %>
-  
-  <div class="form-group">
-  	<%= label f, :fromhashtag, class: "control-label" %>
-      <%= text_input f, :hashtag, class: "form-control" %>
+  	<%= label f, :from_hashtag%>
+      <%= text_input f, :hashtag%>
       <%= error_tag f, :hashtag %>
-  </div>
-  
-  <div class="form-group">
-    <%= submit "Search", class: "btn btn-primary" %>
-  </div>
-
+    <%= submit "Search"%>
 <% end %>
 
 
 
-<%= link "Back to Home", to: page_path(@conn, :home)%>
+<%= link "Back", to: page_path(@conn, :home)%>

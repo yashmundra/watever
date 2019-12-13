@@ -1,18 +1,8 @@
-<h1>Tweets Page</h1>
-
-
+<h2>Send tweet</h2>
 <%= form_for @conn, tweet_path(@conn, :create), [as: :tweet], fn f -> %>
-  
-  <div class="form-group">
-  	<%= label f, :content, class: "control-label" %>
-      <%= text_input f, :content, class: "form-control" %>
-      <%= error_tag f, :content %>
-  </div>
-  
-  <div class="form-group">
-    <%= submit "Send!", class: "btn btn-primary" %>
-  </div>
-
+    <%= label f, :content%>
+    <%= text_input f, :content%>
+    <%= error_tag f, :content %>
+    <%= submit "Tweet"%>
 <% end %>
-
 <%= link "Back to Home", to: page_path(@conn, :home)%>
