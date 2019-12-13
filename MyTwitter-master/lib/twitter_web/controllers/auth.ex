@@ -1,4 +1,4 @@
-defmodule TwitterWeb.Auth do
+defmodule Twitter_backend.Auth do
     # login related module
     import Plug.Conn
     alias Twitter.Repo

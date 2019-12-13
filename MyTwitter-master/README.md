@@ -1,6 +1,6 @@
 Team members:
 Yash Mundra : UFID:3939-2135
-
+Vishwa Patel : UFID:4957-0072
 
 Following are some features that have been implemented:
   1. Create and login twitter users
@@ -17,4 +17,7 @@ Steps for installing and executing:
   mix phx.server
   The website will be hosted at localhost:4000
 
+
+Video link:
+https://vimeo.com/379294016
 

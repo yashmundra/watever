@@ -1,6 +1,6 @@
-defmodule TwitterWeb.RetweetController do
+defmodule Twitter_backend.RetweetController do
     # send retweets
-    use TwitterWeb, :controller 
+    use Twitter_backend, :controller 
     import Ecto.Query
     # alias Twitter.User
     alias Twitter.Tweet

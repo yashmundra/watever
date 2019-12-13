@@ -1,4 +1,4 @@
-defmodule TwitterWeb.UserSocket do
+defmodule Twitter_backend.UserSocket do
   use Phoenix.Socket
 
   transport :websocket, Phoenix.Transports.WebSocket

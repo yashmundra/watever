@@ -10,7 +10,7 @@ defmodule Twitter.Application do
       
       supervisor(Twitter.Repo, []),
       
-      supervisor(TwitterWeb.Endpoint, []),
+      supervisor(Twitter_backend.Endpoint, []),
       
     ]
 
@@ -21,7 +21,7 @@ defmodule Twitter.Application do
 
   
   def config_change(changed, _new, removed) do
-    TwitterWeb.Endpoint.config_change(changed, removed)
+    Twitter_backend.Endpoint.config_change(changed, removed)
     :ok
   end
 end

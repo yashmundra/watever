@@ -1,5 +1,5 @@
-defmodule TwitterWeb.ErrorView do
-  use TwitterWeb, :view
+defmodule Twitter_backend.ErrorView do
+  use Twitter_backend, :view
 
   def render("404.html", _assigns) do
     "Page not found"

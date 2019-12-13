@@ -8,7 +8,7 @@ use Mix.Config
 # file or create a script for recreating it, since it's
 # kept out of version control and might be hard to recover
 # or recreate for your teammates (or yourself later on).
-config :twitter, TwitterWeb.Endpoint,
+config :twitter, Twitter_backend.Endpoint,
   secret_key_base: "PergG5txD1qw8xDiPK5F+0rAvf495aKl3qgIZFGzApbUTMEcVGxHHTdBlrnZi5UG"
 
 # Configure your database

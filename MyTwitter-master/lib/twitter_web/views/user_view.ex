@@ -1,3 +1,3 @@
-defmodule TwitterWeb.UserView do
-  use TwitterWeb, :view
+defmodule Twitter_backend.UserView do
+  use Twitter_backend, :view
 end

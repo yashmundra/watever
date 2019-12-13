@@ -1,9 +1,10 @@
-defmodule TwitterWeb.UserController do
-    # create a new user
-    use TwitterWeb, :controller 
+defmodule Twitter_backend.UserController do
+    
+    use Twitter_backend, :controller 
     import Ecto.Query
-    alias Twitter.User
     alias Twitter.Repo
+    alias Twitter.User
+    
 
 
     def new(conn, _params) do
@@ -18,7 +19,6 @@ defmodule TwitterWeb.UserController do
             {:ok, user} ->
                 conn 
                 |> Guardian.Plug.sign_in(user, :access)
-                |> put_flash(:info, "User Created Successfully!")
                 |> redirect(to: page_path(conn, :home))
             {:error, changeset} ->
                 render(conn, "new.html", changeset: changeset)
@@ -30,37 +30,32 @@ defmodule TwitterWeb.UserController do
     end
 
     def subscribe(conn, %{"follow" => %{"subscribe" => subscribe}}) do
+        subscribed_user = Repo.one(from u in User, where: u.username==^subscribe) 
         logged_user = Guardian.Plug.current_resource(conn)
-        subscribed_user = Repo.one(from u in User, where: u.username==^subscribe) # check whether user you try to subscribe exists
         subscribelist = String.split(logged_user.subscribe,"$$")
         cond do
             subscribe == logged_user.username ->
                 conn
-                |> put_flash(:error, "Cannot subscribe to yourself")
-                |> redirect(to: user_path(conn, :subscribeindex))
-            subscribed_user == nil ->
-                conn
-                |> put_flash(:error, "User you try to subscribe does not exist")
-                |> redirect(to: user_path(conn, :subscribeindex))
+                |> redirect(to: user_path(conn, :sub_indie))
             Enum.member?(subscribelist, subscribe) ->
                 conn
-                |> put_flash(:error, "You've already subscribed to this user")
-                |> redirect(to: user_path(conn, :subscribeindex))
+                |> redirect(to: user_path(conn, :sub_indie))
+            subscribed_user == nil ->
+                conn
+                |> redirect(to: user_path(conn, :sub_indie))
             true ->
-                newsubscribe1 = logged_user.subscribe <> "$$" <> subscribe
-                changeset1 = User.changeset(logged_user, %{subscribe: newsubscribe1})
-                newfollower2 = subscribed_user.follower <> "$$" <> logged_user.username
-                changeset2 = User.changeset(subscribed_user, %{follower: newfollower2})
-                case Repo.update(changeset1) do
+                n_subscribe = logged_user.subscribe <> "$$@@" <> subscribe
+                n_follow = subscribed_user.follower <> "$$@@" <> logged_user.username
+                cs1 = User.changeset(logged_user, %{subscribe: n_subscribe})
+                cs2 = User.changeset(subscribed_user, %{follower: n_follow})
+                case Repo.update(cs1) do
                     {:ok, _} ->
-                        Repo.update(changeset2) # bug!!! happens when 1 succeeds 2 fails
+                        Repo.update(cs2) 
                         conn
-                        |> put_flash(:info, "Subscribe successfully.")
-                        |> redirect(to: user_path(conn, :subscribeindex))
+                        |> redirect(to: user_path(conn, :sub_indie))
                     {:error, _} ->
                         conn
-                        |> put_flash(:error, "Fail to subscribe, database record update failed")
-                        |> redirect(to: user_path(conn, :subscribeindex))
+                        |> redirect(to: user_path(conn, :sub_indie))
                 end
         end
     end

@@ -1,5 +1,5 @@
-defmodule TwitterWeb.PageControllerTest do
-  use TwitterWeb.ConnCase
+defmodule Twitter_backend.PageControllerTest do
+  use Twitter_backend.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"

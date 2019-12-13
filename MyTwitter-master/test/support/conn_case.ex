@@ -1,4 +1,4 @@
-defmodule TwitterWeb.ConnCase do
+defmodule Twitter_backend.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -19,10 +19,10 @@ defmodule TwitterWeb.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
-      import TwitterWeb.Router.Helpers
+      import Twitter_backend.Router.Helpers
 
       # The default endpoint for testing
-      @endpoint TwitterWeb.Endpoint
+      @endpoint Twitter_backend.Endpoint
     end
   end
 

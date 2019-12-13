@@ -10,10 +10,10 @@ config :twitter,
   ecto_repos: [Twitter.Repo]
 
 # Configures the endpoint
-config :twitter, TwitterWeb.Endpoint,
+config :twitter, Twitter_backend.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "vMZOuxn43BYxR8qfKq6H0nmR9pGuVO1gqIfmzA8j8oMg5tf3smDIkehUyGsW2bKc",
-  render_errors: [view: TwitterWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [view: Twitter_backend.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Twitter.PubSub,
            adapter: Phoenix.PubSub.PG2]
 

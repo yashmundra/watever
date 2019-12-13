@@ -22,7 +22,7 @@
 <br>
 <%= link "Search for tweets", to: tweet_path(@conn, :querytweetindex) %>
 <br>
-<%= link "Follow another twitter user", to: user_path(@conn, :subscribeindex) %>
+<%= link "Follow another twitter user", to: user_path(@conn, :sub_indie) %>
 <br>
 <%= link "Sign Out", to: session_path(@conn, :delete, :access), method: :delete%>
 <br><br><br>

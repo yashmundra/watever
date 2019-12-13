@@ -1,4 +1,4 @@
-defmodule TwitterWeb.ChannelCase do
+defmodule Twitter_backend.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,7 +21,7 @@ defmodule TwitterWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint TwitterWeb.Endpoint
+      @endpoint Twitter_backend.Endpoint
     end
   end
 

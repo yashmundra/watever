@@ -1,4 +1,4 @@
-defmodule TwitterWeb.ErrorHelpers do
+defmodule Twitter_backend.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -32,9 +32,9 @@ defmodule TwitterWeb.ErrorHelpers do
     #     dgettext "errors", "is invalid"
     #
     if count = opts[:count] do
-      Gettext.dngettext(TwitterWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(Twitter_backend.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(TwitterWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(Twitter_backend.Gettext, "errors", msg, opts)
     end
   end
 end

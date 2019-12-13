@@ -793,10 +793,10 @@ defmodule Ecto.Changeset do
   The other fields are merged with the following criteria:
 
     * `params` - params are merged (not deep-merged) giving precedence to the
-      params of `changeset2` in case of a conflict. If both changesets have their
+      params of `cs2` in case of a conflict. If both changesets have their
       `:params` fields set to `nil`, the resulting changeset will have its params
       set to `nil` too.
-    * `changes` - changes are merged giving precedence to the `changeset2`
+    * `changes` - changes are merged giving precedence to the `cs2`
       changes.
     * `errors` and `validations` - they are simply concatenated.
     * `required` - required fields are merged; all the fields that appear
@@ -805,20 +805,20 @@ defmodule Ecto.Changeset do
 
   ## Examples
 
-      iex> changeset1 = cast(%Post{}, %{title: "Title"}, [:title])
-      iex> changeset2 = cast(%Post{}, %{title: "New title", body: "Body"}, [:title, :body])
-      iex> changeset = merge(changeset1, changeset2)
+      iex> cs1 = cast(%Post{}, %{title: "Title"}, [:title])
+      iex> cs2 = cast(%Post{}, %{title: "New title", body: "Body"}, [:title, :body])
+      iex> changeset = merge(cs1, cs2)
       iex> changeset.changes
       %{body: "Body", title: "New title"}
 
-      iex> changeset1 = cast(%Post{body: "Body"}, %{title: "Title"}, [:title])
-      iex> changeset2 = cast(%Post{}, %{title: "New title"}, [:title])
-      iex> merge(changeset1, changeset2)
+      iex> cs1 = cast(%Post{body: "Body"}, %{title: "Title"}, [:title])
+      iex> cs2 = cast(%Post{}, %{title: "New title"}, [:title])
+      iex> merge(cs1, cs2)
       ** (ArgumentError) different :data when merging changesets
 
   """
   @spec merge(t, t) :: t | no_return
-  def merge(changeset1, changeset2)
+  def merge(cs1, cs2)
 
   def merge(%Changeset{data: data} = cs1, %Changeset{data: data} = cs2) do
     new_repo        = merge_identical(cs1.repo, cs2.repo, "repos")

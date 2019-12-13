@@ -1,7 +1,7 @@
-defmodule TwitterWeb.Endpoint do
+defmodule Twitter_backend.Endpoint do
   use Phoenix.Endpoint, otp_app: :twitter
 
-  socket "/socket", TwitterWeb.UserSocket
+  socket "/socket", Twitter_backend.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -38,7 +38,7 @@ defmodule TwitterWeb.Endpoint do
     key: "_twitter_key",
     signing_salt: "ZYBYjIBr"
 
-  plug TwitterWeb.Router
+  plug Twitter_backend.Router
 
   @doc """
   Callback invoked for dynamically configuring the endpoint.

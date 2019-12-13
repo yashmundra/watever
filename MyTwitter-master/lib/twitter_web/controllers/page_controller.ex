@@ -1,6 +1,6 @@
-defmodule TwitterWeb.PageController do
+defmodule Twitter_backend.PageController do
   # main page
-  use TwitterWeb, :controller
+  use Twitter_backend, :controller
   import Ecto.Query
   alias Twitter.Tweet
   alias Twitter.Repo

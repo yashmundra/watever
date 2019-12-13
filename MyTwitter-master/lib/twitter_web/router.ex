@@ -1,5 +1,5 @@
-defmodule TwitterWeb.Router do
-  use TwitterWeb, :router
+defmodule Twitter_backend.Router do
+  use Twitter_backend, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,7 +13,7 @@ defmodule TwitterWeb.Router do
 
   pipeline :browser_auth do
     plug Guardian.Plug.VerifySession
-    plug Guardian.Plug.EnsureAuthenticated, handler: TwitterWeb.Token
+    plug Guardian.Plug.EnsureAuthenticated, handler: Twitter_backend.Token
     plug Guardian.Plug.LoadResource
   end
 
@@ -21,7 +21,7 @@ defmodule TwitterWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", TwitterWeb do
+  scope "/", Twitter_backend do
     pipe_through :browser # Use the default browser stack
     
     get "/", SessionController, :new
@@ -29,7 +29,7 @@ defmodule TwitterWeb.Router do
     resources "/sessions", SessionController, only: [:create, :delete]
   end
 
-  scope "/", TwitterWeb do
+  scope "/", Twitter_backend do
     pipe_through [:browser, :browser_auth]
     
     get "/home", PageController, :home
@@ -37,7 +37,7 @@ defmodule TwitterWeb.Router do
     get "/sendtweet", TweetController, :sendtweetindex
     resources "/tweet", TweetController, only: [:create]
 
-    get "/subscribeto", UserController, :subscribeindex
+    get "/subscribeto", UserController, :sub_indie
     post "/users/subscribe", UserController, :subscribe
 
     get "/querytweet", TweetController, :querytweetindex
@@ -48,7 +48,7 @@ defmodule TwitterWeb.Router do
     resources "/retweet", RetweetController
   end
   # Other scopes may use custom stacks.
-  # scope "/api", TwitterWeb do
+  # scope "/api", Twitter_backend do
   #   pipe_through :api
   # end
 end

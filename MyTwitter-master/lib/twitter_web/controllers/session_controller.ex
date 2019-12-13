@@ -1,7 +1,7 @@
-defmodule TwitterWeb.SessionController do
+defmodule Twitter_backend.SessionController do
     # login related module
-    use TwitterWeb, :controller
-    import TwitterWeb.Auth
+    use Twitter_backend, :controller
+    import Twitter_backend.Auth
 
     def new(conn,_params) do
       render(conn, "new.html")

@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
-config :twitter, TwitterWeb.Endpoint,
+config :twitter, Twitter_backend.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
@@ -15,7 +15,7 @@ config :twitter, TwitterWeb.Endpoint,
                     cd: Path.expand("../assets", __DIR__)]]
 
 
-config :twitter, TwitterWeb.Endpoint,
+config :twitter, Twitter_backend.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},

@@ -1,3 +1,3 @@
-defmodule TwitterWeb.SessionView do
-    use TwitterWeb, :view
+defmodule Twitter_backend.SessionView do
+    use Twitter_backend, :view
 end

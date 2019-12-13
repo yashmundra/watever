@@ -1,3 +1,3 @@
-defmodule TwitterWeb.LayoutViewTest do
-  use TwitterWeb.ConnCase, async: true
+defmodule Twitter_backend.LayoutViewTest do
+  use Twitter_backend.ConnCase, async: true
 end

@@ -1,3 +1,3 @@
-defmodule TwitterWeb.LayoutView do
-  use TwitterWeb, :view
+defmodule Twitter_backend.LayoutView do
+  use Twitter_backend, :view
 end

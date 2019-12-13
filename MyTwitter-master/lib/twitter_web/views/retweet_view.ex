@@ -1,4 +1,4 @@
-defmodule TwitterWeb.RetweetView do
-    use TwitterWeb, :view
+defmodule Twitter_backend.RetweetView do
+    use Twitter_backend, :view
 end
   

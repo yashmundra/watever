@@ -1,6 +1,6 @@
-defmodule TwitterWeb.Token do
+defmodule Twitter_backend.Token do
 	# login related module
-	use TwitterWeb, :controller
+	use Twitter_backend, :controller
 
 	def unauthenticated(conn, _params) do
 		conn
