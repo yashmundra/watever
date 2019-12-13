@@ -5,11 +5,10 @@ defmodule Twitter.User do
 
 
   schema "users" do
-    field :username, :string
-    field :password, :string
     field :follower, :string, default: ""
+    field :username, :string
     field :subscribe, :string, default: ""
-
+    field :password, :string
     timestamps()
   end
 

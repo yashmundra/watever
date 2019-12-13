@@ -6,11 +6,10 @@ defmodule Twitter.Tweet do
 
   schema "tweets" do
     field :author, :string
-    field :content, :string
-    field :hashtag, :string
     field :mentioned, :string
     field :retweeted_status, :boolean, default: false
-
+    field :hashtag, :string
+    field :content, :string
     timestamps()
   end
 
