@@ -5,29 +5,15 @@ defmodule Twitter_backend.UserController do
     alias Twitter.Repo
     alias Twitter.User
     
-
-
-    def new(conn, _params) do
-        changeset = User.changeset(%User{},%{})
-        render(conn, "new.html", changeset: changeset)
-    end
-
-    def create(conn, %{"user" => user_params}) do
-        changeset = User.changeset(%User{}, user_params)
-
-        case Repo.insert(changeset) do
-            {:ok, user} ->
-                conn 
-                |> Guardian.Plug.sign_in(user, :access)
-                |> redirect(to: page_path(conn, :home))
-            {:error, changeset} ->
-                render(conn, "new.html", changeset: changeset)
-        end
-    end
-
     def subscribeindex(conn, _params) do
         render(conn, "subscribe.html")
     end
+
+    def new(conn, _params) do
+        changeset = User.changeset(%User{},%{})
+        render(conn, "make.html", changeset: changeset)
+    end
+
 
     def subscribe(conn, %{"follow" => %{"subscribe" => subscribe}}) do
         subscribed_user = Repo.one(from u in User, where: u.username==^subscribe) 
@@ -60,7 +46,18 @@ defmodule Twitter_backend.UserController do
         end
     end
     
+    def create(conn, %{"user" => user_params}) do
+        changeset = User.changeset(%User{}, user_params)
 
+        case Repo.insert(changeset) do
+            {:ok, user} ->
+                conn 
+                |> Guardian.Plug.sign_in(user, :access)
+                |> redirect(to: page_path(conn, :home))
+            {:error, changeset} ->
+                render(conn, "make.html", changeset: changeset)
+        end
+    end
 
     
 end

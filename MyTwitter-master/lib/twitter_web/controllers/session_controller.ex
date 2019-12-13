@@ -1,30 +1,29 @@
 defmodule Twitter_backend.SessionController do
-    # login related module
     use Twitter_backend, :controller
     import Twitter_backend.Auth
 
     def new(conn,_params) do
-      render(conn, "new.html")
+      render(conn, "make.html")
     end
 
-    def create(conn, %{"session" => %{"username" => username, "password" => password}}) do
-      case login_with(conn, username, password, repo: Repo) do
-        {:ok, conn} ->
-          logged_user = Guardian.Plug.current_resource(conn)
-          conn
-          |> put_flash(:info, "logged in!")
-          |> redirect(to: page_path(conn, :home))
-        {:error, _reason, conn} ->
-          conn
-          |> put_flash(:error, "Wrong username/password")
-          |> render("new.html")
-      end
-    end
 
    def delete(conn, _) do
      conn
      |> Guardian.Plug.sign_out
      |> redirect(to: "/")
    end
+
+
+   def create(conn, %{"session" => %{"username" => username, "password" => password}}) do
+    case login_with(conn, username, password, repo: Repo) do
+      {:ok, conn} ->
+        logged_user = Guardian.Plug.current_resource(conn)
+        conn
+        |> redirect(to: page_path(conn, :home))
+      {:error, _reason, conn} ->
+        conn
+        |> render("make.html")
+    end
+  end
 
 end

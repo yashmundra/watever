@@ -1,5 +1,5 @@
 defmodule Twitter_backend.Auth do
-    # login related module
+    
     import Plug.Conn
     alias Twitter.Repo
 
@@ -9,8 +9,7 @@ defmodule Twitter_backend.Auth do
     end
 
     def login_with(conn, username, password, _opts) do
-        # repo = Keyword.fetch!(opts, :repo)
-        # user = repo.get_by(Twitter.User, username: username)
+        
         user = Repo.get_by(Twitter.User, username: username)
 
         cond do

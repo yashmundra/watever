@@ -22,7 +22,7 @@ defmodule Twitter_backend.Router do
   end
 
   scope "/", Twitter_backend do
-    pipe_through :browser # Use the default browser stack
+    pipe_through :browser 
     
     get "/", SessionController, :new
     resources "/users", UserController, [:new, :create]
@@ -41,9 +41,9 @@ defmodule Twitter_backend.Router do
     post "/users/subscribe", UserController, :subscribe
 
     get "/querytweet", TweetController, :querytweetindex
-    post "/querytweet/fromsubscriber", TweetController, :searchfromsubscriber
-    post "/querytweet/frommentioned", TweetController, :searchfrommentioned
-    post "/querytweet/fromhashtag", TweetController, :searchfromhashtag
+    post "/querytweet/fromsubscriber", TweetController, :query_subs
+    post "/querytweet/frommentioned", TweetController, :query_mention
+    post "/querytweet/fromhashtag", TweetController, :query_hashtag
     
     resources "/retweet", RetweetController
   end

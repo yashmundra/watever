@@ -1,0 +1,5 @@
+<h2>User creation</h2>
+
+<%= render "new_data.html", changeset: @changeset, action: user_path(@conn, :create) %>
+
+<%= link "Back", to: session_path(@conn, :new) %>

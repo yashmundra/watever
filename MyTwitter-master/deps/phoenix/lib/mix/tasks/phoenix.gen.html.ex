@@ -52,9 +52,9 @@ defmodule Mix.Tasks.Phoenix.Gen.Html do
     Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.html", binding, [
       {:eex, "controller.ex",       "web/controllers/#{path}_controller.ex"},
       {:eex, "edit.html.eex",       "web/templates/#{path}/edit.html.eex"},
-      {:eex, "form.html.eex",       "web/templates/#{path}/form.html.eex"},
+      {:eex, "new_data.html.eex",       "web/templates/#{path}/new_data.html.eex"},
       {:eex, "index.html.eex",      "web/templates/#{path}/index.html.eex"},
-      {:eex, "new.html.eex",        "web/templates/#{path}/new.html.eex"},
+      {:eex, "make.html.eex",        "web/templates/#{path}/make.html.eex"},
       {:eex, "show.html.eex",       "web/templates/#{path}/show.html.eex"},
       {:eex, "view.ex",             "web/views/#{path}_view.ex"},
       {:eex, "controller_test.exs", "test/controllers/#{path}_controller_test.exs"},

@@ -10,7 +10,7 @@ defmodule <%= module %>Controller do
 
   def new(conn, _params) do
     changeset = <%= alias %>.changeset(%<%= alias %>{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "make.html", changeset: changeset)
   end
 
   def create(conn, %{<%= inspect singular %> => <%= singular %>_params}) do
@@ -22,7 +22,7 @@ defmodule <%= module %>Controller do
         |> put_flash(:info, "<%= human %> created successfully.")
         |> redirect(to: <%= singular %>_path(conn, :show, <%= singular %>))
       {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "make.html", changeset: changeset)
     end
   end
 

@@ -27,7 +27,7 @@ defmodule Phoenix.HTML.Form do
 
       def new(conn, _params) do
         changeset = User.changeset(%User{})
-        render conn, "new.html", changeset: changeset
+        render conn, "make.html", changeset: changeset
       end
 
   where `User.changeset/2` is defined as follows:

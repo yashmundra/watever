@@ -1,19 +1,19 @@
 <h1>Query for tweets</h1>
 
-<%= form_for @conn, tweet_path(@conn, :searchfromsubscriber), [as: :searchsubscriber], fn f -> %>
+<%= form_for @conn, tweet_path(@conn, :query_subs), [as: :searchsubscriber], fn f -> %>
   	<%= label f, :from_subscriber%>
       <%= text_input f, :subscriber%>
       <%= error_tag f, :subscriber %>
     <%= submit "Search"%>
 <% end %>
 
-<%= form_for @conn, tweet_path(@conn, :searchfrommentioned), [as: :searchmentioned], fn f -> %>
+<%= form_for @conn, tweet_path(@conn, :query_mention), [as: :searchmentioned], fn f -> %>
   	<%= label f, :from_mentioned %>
       <%= text_input f, :mentioned%>
       <%= error_tag f, :mentioned %>
     <%= submit "Search"%>
 <% end %>
-<%= form_for @conn, tweet_path(@conn, :searchfromhashtag), [as: :searchhashtag], fn f -> %>
+<%= form_for @conn, tweet_path(@conn, :query_hashtag), [as: :searchhashtag], fn f -> %>
   	<%= label f, :from_hashtag%>
       <%= text_input f, :hashtag%>
       <%= error_tag f, :hashtag %>

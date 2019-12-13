@@ -11,7 +11,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
   def new(conn, _params) do
     changeset = <%= inspect context.alias %>.change_<%= schema.singular %>(%<%= inspect schema.alias %>{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "make.html", changeset: changeset)
   end
 
   def create(conn, %{<%= inspect schema.singular %> => <%= schema.singular %>_params}) do
@@ -21,7 +21,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         |> put_flash(:info, "<%= schema.human_singular %> created successfully.")
         |> redirect(to: <%= schema.route_helper %>_path(conn, :show, <%= schema.singular %>))
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "make.html", changeset: changeset)
     end
   end
 

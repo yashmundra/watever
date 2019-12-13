@@ -1,9 +1,9 @@
 defmodule Twitter.GuardianSerializer do
-	# login related module
+	
 	@behaviour Guardian.Serializer 
-
-	alias Twitter.Repo
 	alias Twitter.User
+	alias Twitter.Repo
+	
 
     def for_token(user = %User{}), do: { :ok, "User:#{user.id}" }
 	def for_token(_), do: { :error, "Unknown resource type" }
